@@ -46,12 +46,14 @@ class EmployeeController extends Controller
      */
     public function store(Request $request) // Ganti dengan StoreEmployeeRequest $request jika sudah dibuat
     {
+
+        
         // Contoh sederhana validasi (sebaiknya pindahkan ke Form Request)
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
             'first_name' => 'required|string|max:100',
             'last_name' => 'required|string|max:100',
-            'gender' => 'required|in:L,P', // Laki-laki atau Perempuan
+            'gender' => 'required|in:M,F', // Laki-laki atau Perempuan
             'position_id' => 'nullable|exists:positions,id',
             'department_id' => 'nullable|exists:departments,id',
             'address' => 'nullable|string',
@@ -201,4 +203,43 @@ class EmployeeController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR); // 500 Internal Server Error
         }
     }
+
+    public function getDepartments()
+    {
+        try {
+            $departments = \App\Models\Department::all();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Daftar department berhasil diambil.',
+                'data' => $departments
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengambil data department.',
+                'error' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function getPositions()
+    {
+        try {
+            $positions = \App\Models\Position::all();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Daftar position berhasil diambil.',
+                'data' => $positions
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengambil data position.',
+                'error' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

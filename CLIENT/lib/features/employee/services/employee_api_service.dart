@@ -4,7 +4,7 @@ import '../models/employee_model.dart';
 
 class EmployeeApiService {
   // Ganti dengan URL API Laravel Anda
-  static const String baseUrl = 'http://10.0.2.2:8000/api';
+  static const String baseUrl = 'http://127.0.0.1:8000/api';
   
   // Get all employees
   Future<List<Employee>> getAllEmployees() async {
@@ -109,4 +109,31 @@ class EmployeeApiService {
       throw Exception('Error deleting employee: $e');
     }
   }
+
+  Future<List<Department>> fetchDepartments() async {
+  final response = await http.get(Uri.parse('http://127.0.0.1:8000/api/employee/department'));
+
+  if (response.statusCode == 200) {
+    final jsonData = json.decode(response.body);
+    List data = jsonData['data'];
+
+    return data.map((d) => Department.fromJson(d)).toList();
+  } else {
+    throw Exception('Gagal memuat daftar department');
+  }
+}
+
+Future<List<Position>> fetchPositions() async {
+  final response = await http.get(Uri.parse('http://127.0.0.1:8000/api/employee/position'));
+
+  if (response.statusCode == 200) {
+    final jsonData = json.decode(response.body);
+    List data = jsonData['data'];
+
+    return data.map((p) => Position.fromJson(p)).toList();
+  } else {
+    throw Exception('Gagal memuat daftar position');
+  }
+}
+
 }

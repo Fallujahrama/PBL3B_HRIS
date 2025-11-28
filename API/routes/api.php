@@ -10,3 +10,5 @@ Route::apiResource('letter-formats', LetterFormatController::class);
 Route::apiResource('letters', LetterController::class);
 
 Route::apiResource('employees', EmployeeController::class);
+Route::get('/employee/department', [EmployeeController::class, 'getDepartments']);
+Route::get('/employee/position', [EmployeeController::class, 'getPositions']);
