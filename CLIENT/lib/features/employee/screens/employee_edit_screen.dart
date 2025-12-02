@@ -132,7 +132,7 @@ class _EmployeeEditScreenState extends State<EmployeeEditScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Employee berhasil diperbarui')),
+          const SnackBar(content: Text('Karyawan berhasil diperbarui')),
         );
         context.pop();
       }
@@ -154,7 +154,7 @@ class _EmployeeEditScreenState extends State<EmployeeEditScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Edit Employee',
+          'Edit Karyawan',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.blue,
@@ -181,7 +181,7 @@ class _EmployeeEditScreenState extends State<EmployeeEditScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            'User Account',
+                            'Akun Pengguna',
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 16),
@@ -194,11 +194,11 @@ class _EmployeeEditScreenState extends State<EmployeeEditScreen> {
                             keyboardType: TextInputType.emailAddress,
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
-                              hintText: 'Enter email',
+                              hintText: 'Masukkan email',
                               prefixIcon: Icon(Icons.email),
                             ),
                             validator: (value) {
-                              if (value == null || value.isEmpty) return 'Email is required';
+                              if (value == null || value.isEmpty) return 'Email harus diisi';
                               if (!value.contains('@')) return 'Email tidak valid';
                               return null;
                             },
@@ -235,7 +235,7 @@ class _EmployeeEditScreenState extends State<EmployeeEditScreen> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text('Is Admin', style: TextStyle(fontSize: 16)),
+                                const Text('Admin ?', style: TextStyle(fontSize: 16)),
                                 Switch(
                                   value: _isAdmin,
                                   onChanged: (value) {
@@ -266,7 +266,7 @@ class _EmployeeEditScreenState extends State<EmployeeEditScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            'Employee Information',
+                            'Informasi Karyawan',
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 16),
@@ -278,7 +278,7 @@ class _EmployeeEditScreenState extends State<EmployeeEditScreen> {
                             controller: _firstNameController,
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
-                              hintText: 'Enter first name',
+                              hintText: 'Masukkan nama depan',
                               prefixIcon: Icon(Icons.person),
                             ),
                             validator: (value) {
@@ -295,7 +295,7 @@ class _EmployeeEditScreenState extends State<EmployeeEditScreen> {
                             controller: _lastNameController,
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
-                              hintText: 'Enter last name',
+                              hintText: 'Masukkan nama belakang',
                               prefixIcon: Icon(Icons.person_outline),
                             ),
                             validator: (value) {
@@ -306,7 +306,7 @@ class _EmployeeEditScreenState extends State<EmployeeEditScreen> {
                           const SizedBox(height: 16),
 
                           // Gender
-                          const Text('Gender', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                          const Text('Jenis Kelamin', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                           const SizedBox(height: 8),
                           Container(
                             decoration: BoxDecoration(
@@ -344,7 +344,7 @@ class _EmployeeEditScreenState extends State<EmployeeEditScreen> {
                               border: OutlineInputBorder(),
                               prefixIcon: Icon(Icons.work),
                             ),
-                            hint: const Text('Select position'),
+                            hint: const Text('Pilih Posisi'),
                             value: _selectedPositionId,
                             items: _positions.map((pos) {
                               return DropdownMenuItem<int>(
@@ -368,7 +368,7 @@ class _EmployeeEditScreenState extends State<EmployeeEditScreen> {
                               border: OutlineInputBorder(),
                               prefixIcon: Icon(Icons.business),
                             ),
-                            hint: const Text('Select department'),
+                            hint: const Text('Pilih Departemen'),
                             value: _selectedDepartmentId,
                             items: _departments.map((dept) {
                               return DropdownMenuItem<int>(
@@ -391,7 +391,7 @@ class _EmployeeEditScreenState extends State<EmployeeEditScreen> {
                             controller: _addressController,
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
-                              hintText: 'Enter address (optional)',
+                              hintText: 'Masukkan Alamat',
                               prefixIcon: Icon(Icons.home),
                             ),
                             maxLines: 3,
@@ -417,7 +417,7 @@ class _EmployeeEditScreenState extends State<EmployeeEditScreen> {
                       child: _isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
                           : const Text(
-                              'Update',
+                              'Edit',
                               style: TextStyle(fontSize: 16, color: Colors.white),
                             ),
                     ),

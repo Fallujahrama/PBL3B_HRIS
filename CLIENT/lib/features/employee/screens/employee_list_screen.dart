@@ -47,7 +47,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('EMPLOYEES', style: TextStyle(color: Colors.white)),
+        title: const Text('KARYAWAN', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.blue,
         iconTheme: const IconThemeData(color: Colors.white),
 
@@ -57,7 +57,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/employee/add').then((_) => _loadEmployees()),
         icon: const Icon(Icons.add),
-        label: const Text('Add Employee'),
+        label: const Text('Tambah Karyawan'),
         backgroundColor: Colors.blue,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -89,7 +89,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
     }
 
     if (_employees.isEmpty) {
-      return const Center(child: Text('No employees found'));
+      return const Center(child: Text('Tidak ada karyawan yang ditemukan'));
     }
 
     return RefreshIndicator(

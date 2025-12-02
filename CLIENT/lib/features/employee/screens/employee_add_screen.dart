@@ -97,7 +97,7 @@ class _EmployeeAddScreenState extends State<EmployeeAddScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Employee berhasil ditambahkan')),
+          const SnackBar(content: Text('Karyawan berhasil ditambahkan')),
         );
         context.pop();
       }
@@ -119,7 +119,7 @@ class _EmployeeAddScreenState extends State<EmployeeAddScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Tambah Employee',
+          'Tambah Karyawan',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.blue,
@@ -144,7 +144,7 @@ class _EmployeeAddScreenState extends State<EmployeeAddScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'User Account',
+                      'Akun Pengguna',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 16),
@@ -157,11 +157,11 @@ class _EmployeeAddScreenState extends State<EmployeeAddScreen> {
                       keyboardType: TextInputType.emailAddress,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
-                        hintText: 'Enter email',
+                        hintText: 'Masukkan email',
                         prefixIcon: Icon(Icons.email),
                       ),
                       validator: (value) {
-                        if (value == null || value.isEmpty) return 'Email is required';
+                        if (value == null || value.isEmpty) return 'Email wajib diisi';
                         if (!value.contains('@')) return 'Email tidak valid';
                         return null;
                       },
@@ -176,11 +176,11 @@ class _EmployeeAddScreenState extends State<EmployeeAddScreen> {
                       obscureText: true,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
-                        hintText: 'Enter password (min. 6 characters)',
+                        hintText: 'Masukkan kata sandi (minimal 6 karakter)',
                         prefixIcon: Icon(Icons.lock),
                       ),
                       validator: (value) {
-                        if (value == null || value.isEmpty) return 'Password is required';
+                        if (value == null || value.isEmpty) return 'Password wajib diisi';
                         if (value.length < 6) return 'Password minimal 6 karakter';
                         return null;
                       },
@@ -197,7 +197,7 @@ class _EmployeeAddScreenState extends State<EmployeeAddScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Is Admin', style: TextStyle(fontSize: 16)),
+                          const Text('Admin ?', style: TextStyle(fontSize: 16)),
                           Switch(
                             value: _isAdmin,
                             onChanged: (value) {
@@ -228,7 +228,7 @@ class _EmployeeAddScreenState extends State<EmployeeAddScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Employee Information',
+                      'Informasi Karyawan',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 16),
@@ -240,7 +240,7 @@ class _EmployeeAddScreenState extends State<EmployeeAddScreen> {
                       controller: _firstNameController,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
-                        hintText: 'Enter first name',
+                        hintText: 'Masukkan Nama Depan',
                         prefixIcon: Icon(Icons.person),
                       ),
                       validator: (value) {
@@ -257,7 +257,7 @@ class _EmployeeAddScreenState extends State<EmployeeAddScreen> {
                       controller: _lastNameController,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
-                        hintText: 'Enter last name',
+                        hintText: 'Masukkan Nama Belakang',
                         prefixIcon: Icon(Icons.person_outline),
                       ),
                       validator: (value) {
@@ -268,7 +268,7 @@ class _EmployeeAddScreenState extends State<EmployeeAddScreen> {
                     const SizedBox(height: 16),
 
                     // Gender
-                    const Text('Gender', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                    const Text('Jenis Kelamin', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                     const SizedBox(height: 8),
                     Container(
                       decoration: BoxDecoration(
@@ -306,7 +306,7 @@ class _EmployeeAddScreenState extends State<EmployeeAddScreen> {
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.work),
                       ),
-                      hint: const Text('Select position'),
+                      hint: const Text('Pilih Posisi'),
                       value: _selectedPositionId,
                       items: _positions.map((pos) {
                         return DropdownMenuItem<int>(
@@ -330,7 +330,7 @@ class _EmployeeAddScreenState extends State<EmployeeAddScreen> {
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.business),
                       ),
-                      hint: const Text('Select department'),
+                      hint: const Text('Pilih departemen'),
                       value: _selectedDepartmentId,
                       items: _departments.map((dept) {
                         return DropdownMenuItem<int>(
@@ -353,7 +353,7 @@ class _EmployeeAddScreenState extends State<EmployeeAddScreen> {
                       controller: _addressController,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
-                        hintText: 'Enter address (optional)',
+                        hintText: 'Masukkan Alamat',
                         prefixIcon: Icon(Icons.home),
                       ),
                       maxLines: 3,

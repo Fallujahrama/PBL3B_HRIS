@@ -48,17 +48,17 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Employee'),
-        content: const Text('Are you sure you want to delete this employee?'),
+        title: const Text('Hapus Karyawan'),
+        content: const Text('Apakah Anda yakin ingin menghapus karyawan ini?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: const Text('Batal'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+            child: const Text('Hapus'),
           ),
         ],
       ),
@@ -70,7 +70,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
       await _apiService.deleteEmployee(int.parse(widget.employeeId));
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Employee deleted successfully')),
+          const SnackBar(content: Text('Karyawan berhasil dihapus.')),
         );
         context.pop(true);
       }
@@ -87,7 +87,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Employee Detail', style: TextStyle(color: Colors.white)),
+        title: const Text('Detail Karyawan', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.blue,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -119,7 +119,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
     }
 
     if (_employee == null) {
-      return const Center(child: Text('Employee not found'));
+      return const Center(child: Text('Karyawan tidak ditemukan'));
     }
 
     return SingleChildScrollView(
@@ -163,7 +163,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                   const Divider(height: 32, thickness: 1),
                   
                   _buildDetailRow(
-                    'Gender', 
+                    'Jenis Kelamin', 
                     _employee!.gender == 'M' ? 'Laki-laki' : 'Perempuan'
                   ),
                   const Divider(height: 32, thickness: 1),
@@ -192,7 +192,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                       context.push('/employee/edit/${widget.employeeId}').then((_) => _loadEmployee());
                     },
                     icon: const Icon(Icons.edit, color: Colors.white),
-                    label: const Text('Update', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600)),
+                    label: const Text('Edit', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -208,7 +208,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                   child: ElevatedButton.icon(
                     onPressed: _deleteEmployee,
                     icon: const Icon(Icons.delete, color: Colors.white),
-                    label: const Text('Delete', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600)),
+                    label: const Text('Hapus', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
