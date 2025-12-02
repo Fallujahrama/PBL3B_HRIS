@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:tracer_study_test_api/features/summary_salary/screens/summary_salary_screen.dart';
 import '../features/splash/screens/splash_screen.dart';
 import '../features/home/screens/home_screen.dart';
 import '../features/superior/screens/superior_screen.dart';
@@ -19,8 +20,8 @@ class AppRoutes {
         builder: (context, state) => const HomeScreen(),
       ),
       GoRoute(
-        path: '/superior',
-        builder: (context, state) => const SuperiorScreen(),
+        path: '/summary-salary',
+        builder: (context, state) => const SummarySalaryScreen(),
       ),
       GoRoute(
         path: '/positions',
