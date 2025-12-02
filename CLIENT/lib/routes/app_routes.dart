@@ -3,6 +3,10 @@ import 'package:tracer_study_test_api/features/summary_salary/screens/summary_sa
 import '../features/splash/screens/splash_screen.dart';
 import '../features/home/screens/home_screen.dart';
 import '../features/superior/screens/superior_screen.dart';
+import '../features/employee/screens/employee_list_screen.dart';
+import '../features/employee/screens/employee_add_screen.dart';
+import '../features/employee/screens/employee_detail_screen.dart';
+import '../features/employee/screens/employee_edit_screen.dart';
 import '../features/position/screens/position_screen.dart';
 import '../features/position/screens/position_form_screen.dart'; // Import baru
 import '../features/position/models/position.dart'; // Import model
@@ -69,6 +73,30 @@ class AppRoutes {
         builder: (context, state) {
           final dept = state.extra as Department?;
           return DepartmentFormPage(department: dept);
+        },
+      ),
+      
+      // Employee Routes
+      GoRoute(
+        path: '/employee',
+        builder: (context, state) => const EmployeeListScreen(),
+      ),
+      GoRoute(
+        path: '/employee/add',
+        builder: (context, state) => const EmployeeAddScreen(),
+      ),
+      GoRoute(
+        path: '/employee/detail/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return EmployeeDetailScreen(employeeId: id);
+        },
+      ),
+      GoRoute(
+        path: '/employee/edit/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return EmployeeEditScreen(employeeId: id);
         },
       ),
     ],
