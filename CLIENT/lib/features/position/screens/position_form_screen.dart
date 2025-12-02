@@ -43,25 +43,19 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
   void initState() {
     super.initState();
 
-    _readOnly = widget.position != null; // jika ada posisi -> awalnya read-only
+    // Tentukan readOnly: true jika edit (widget.position != null), false jika create
+    _readOnly = widget.position != null; 
 
-    _nameController = TextEditingController(text: widget.position?.name ?? '');
-    _rateRegulerController = TextEditingController(
-      text: widget.position?.rateReguler?.toString() ?? '',
-    );
-    _rateOvertimeController = TextEditingController(
-      text: widget.position?.rateOvertime?.toString() ?? '',
-    );
-
-    // Inisialisasi readOnly berdasarkan apakah ada position (edit) atau tidak (create)
-    _readOnly = widget.position != null;
-
+    // Inisialisasi nilai awal
     _rateRegulerValue = widget.position?.rateReguler?.toDouble();
     _rateOvertimeValue = widget.position?.rateOvertime?.toDouble();
-
+    
+    // PERBAIKAN: Hanya inisialisasi controller sekali dengan nilai yang tepat
+    _nameController = TextEditingController(text: widget.position?.name ?? '');
     _rateRegulerController = TextEditingController();
     _rateOvertimeController = TextEditingController();
 
+    // Set teks awal yang sudah terformat Rupiah
     _setControllersInitialText();
   }
 
@@ -118,13 +112,10 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
     setState(() => _isLoading = false);
 
     if (success && mounted) {
+      // PERBAIKAN: Hapus baris SnackBar dan pop yang redundant
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Data berhasil disimpan!")));
-      context.pop(true); // Kembali ke list dan refresh
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Data berhasil disimpan!")),
-      );
       // PENTING: kembalikan true supaya master list refresh
       context.pop(true);
     } else if (mounted) {
@@ -163,11 +154,10 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
       if (success && mounted) {
         context.pop(true);
       } else if (mounted) {
-        setState(() => _isLoading = false);
+        // PERBAIKAN: Hapus baris setState dan SnackBar yang redundant
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text("Gagal menghapus data.")));
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Gagal menghapus data.")));
       }
     }
   }
@@ -209,19 +199,21 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
                 },
           decoration: InputDecoration(
             filled: true,
-            fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 14,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
+            // PERBAIKAN: Hapus properti yang redundant
+            // fillColor: Colors.white, // Ini redundant, diulang di bawah
+            // contentPadding: const EdgeInsets.symmetric(
+            //   horizontal: 12,
+            //   vertical: 14,
+            // ),
+            // border: OutlineInputBorder(
+            //   borderRadius: BorderRadius.circular(8),
+            //   borderSide: BorderSide(color: Colors.grey.shade300),
+            // ),
+            // enabledBorder: OutlineInputBorder(
+            //   borderRadius: BorderRadius.circular(8),
+            //   borderSide: BorderSide(color: Colors.grey.shade300),
+            // ),
+            // PERBAIKAN: Hanya gunakan satu set dekorasi di sini
             fillColor: _readOnly ? Colors.grey.shade100 : Colors.white,
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
@@ -243,12 +235,11 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6F8),
       appBar: AppBar(
-        title: Text(isEdit ? "Position Detail" : "Tambah Position"),
+        // PERBAIKAN: Hapus title dan color yang redundant dan konflik.
+        // Hanya gunakan properti yang diinginkan.
+        title: Text(title),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        title: Text(title),
-        backgroundColor: Colors.blueAccent,
-        foregroundColor: Colors.white,
         elevation: 0,
         actions: [
           if (isEditMode && !_readOnly)
@@ -272,29 +263,22 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
             children: [
               if (isEditMode) ...[
                 const SizedBox(height: 10),
+                // PERBAIKAN: Hapus CircleAvatar dan Text yang redundant
                 CircleAvatar(
                   radius: 40,
-                  backgroundImage: NetworkImage(
-                    'https://ui-avatars.com/api/?name=Job+Position&background=0D8ABC&color=fff',
-                  ),
                   backgroundImage: NetworkImage('https://ui-avatars.com/api/?name=${Uri.encodeComponent(widget.position!.name ?? "Posisi")}&background=0D8ABC&color=fff'),
                 ),
                 const SizedBox(height: 10),
-                Text(
-                  widget.position!.name ?? "-",
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
                 Text(widget.position!.name ?? "-", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 20),
               ],
 
               // Form Fields (enabled mengikuti _readOnly)
+              // PERBAIKAN: Hapus _buildTextField yang redundant
               _buildTextField(
                 label: "Nama Posisi",
                 controller: _nameController,
+                focusNode: _firstFocus, // Tambahkan focusNode di sini
               ),
               _buildTextField(
                 label: "Rate Reguler",
@@ -306,9 +290,6 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
                 controller: _rateOvertimeController,
                 isNumber: true,
               ),
-              _buildTextField(label: "Nama Posisi", controller: _nameController, focusNode: _firstFocus),
-              _buildTextField(label: "Rate Reguler", controller: _rateRegulerController, isNumber: true),
-              _buildTextField(label: "Rate Overtime", controller: _rateOvertimeController, isNumber: true),
 
               const SizedBox(height: 20),
 
@@ -319,18 +300,7 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
                   onPressed: _isLoading
                       ? null
                       : () {
-                          // Jika mode edit dan saat ini read-only -> ubah mode jadi editable (first press)
-                          if (isEdit && _readOnly) {
-                            setState(() {
-                              _readOnly = false;
-                            });
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  "Mode edit aktif. Silakan ubah data lalu tekan Update lagi untuk menyimpan.",
-                                ),
-                              ),
-                            );
+                          // PERBAIKAN: Hapus logika yang redundant
                           // jika edit mode & masih readOnly -> ubah jadi editable
                           if (isEditMode && _readOnly) {
                             setState(() => _readOnly = false);
@@ -342,27 +312,14 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
                           _submitForm();
                         },
                   style: ElevatedButton.styleFrom(
-                    
+                    // PERBAIKAN: Hapus properti style yang redundant dan konflik
                     backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    backgroundColor: Colors.blueAccent,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
-                  child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      // Tetap pakai label "Update" sesuai permintaan user saat edit; saat create tampil "Simpan"
-                      : Text(
-                          isEdit ? "Update" : "Simpan",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                  child: _isLoading ? const CircularProgressIndicator(color: Colors.white) : Text(primaryButtonLabel, style: const TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold)),
+                  child: _isLoading 
+                      ? const CircularProgressIndicator(color: Colors.white) 
+                      : Text(primaryButtonLabel, style: const TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
               ),
 
@@ -374,18 +331,17 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
                   child: TextButton(
                     onPressed: _isLoading || !_readOnly ? null : _deletePosition,
                     style: TextButton.styleFrom(
+                      // PERBAIKAN: Hapus properti style yang redundant dan konflik
                       backgroundColor: Theme.of(context).colorScheme.error,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      backgroundColor: _readOnly && !_isLoading ? Colors.redAccent : Colors.grey.shade400,
+                      foregroundColor: Theme.of(context).colorScheme.onError, // Pastikan teks kontras
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                     child: const Text(
                       "Delete",
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.white,
+                        // PERBAIKAN: Hapus hardcoded color, sudah diatur oleh foregroundColor
+                        // color: Colors.white, 
                         fontWeight: FontWeight.bold,
                       ),
                     ),
