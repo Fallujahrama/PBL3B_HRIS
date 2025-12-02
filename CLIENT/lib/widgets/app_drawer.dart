@@ -19,25 +19,44 @@ class AppDrawer extends StatelessWidget {
             ),
           ),
 
+          // ==== HOME ====
           ListTile(
             leading: const Icon(Icons.home),
             title: const Text("Home"),
             onTap: () => context.go('/home'),
           ),
 
+          
+
+
+          // ==== POSITION (MASTER POSITION) ====
+          ListTile(
+            leading: const Icon(Icons.work),
+            title: const Text("Positions"),
+            onTap: () => context.go('/positions'),
+          ),
+          
+
+          ListTile(
+            leading: const Icon(Icons.apartment),
+            title: const Text("Department"),
+            onTap: () => context.go('/departments'),
+          ),
+          
+          //  MENU BARU: DEPARTMENT
           ListTile(
             leading: const Icon(Icons.people),
             title: const Text("Employees"),
             onTap: () => context.go('/employee'),
           ),
-
-          ListTile(
-            leading: const Icon(Icons.group),
-            title: const Text("Superior"),
-            onTap: () => context.go('/superior'),
+          
+             ListTile(
+            leading: const Icon(Icons.article),
+            title: const Text("Laporan Gaji Pegawai"),
+            onTap: () => context.go('/summary-salary'),
           ),
         ],
       ),
     );
   }
-}
+} 

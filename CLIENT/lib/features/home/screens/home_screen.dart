@@ -13,10 +13,10 @@ class HomeScreen extends StatelessWidget {
       ),
       drawer: const AppDrawer(),
       body: Center(
-        child: ElevatedButton(
-          onPressed: () => context.go('/superior'),
-          child: const Text("Lihat Data Superior"),
-        ),
+        // child: ElevatedButton(
+        //   onPressed: () => context.go('/superior'),
+        //   child: const Text("Lihat Data Superior"),
+        // ),
       ),
     );
   }
