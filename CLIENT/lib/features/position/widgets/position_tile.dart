@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../models/position.dart';
 
 class PositionTile extends StatelessWidget {
   final Position item;
-  final VoidCallback onTap; // Aksi ketika card diklik
+  final VoidCallback onTap;
 
   const PositionTile({
     super.key,
@@ -13,7 +14,14 @@ class PositionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Mengambil inisial nama untuk avatar
+    // Format Rupiah
+    final currency = NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp ',
+      decimalDigits: 0,
+    );
+
+    // Ambil inisial nama
     String initial = item.name != null && item.name!.isNotEmpty
         ? item.name![0].toUpperCase()
         : "?";
@@ -37,7 +45,7 @@ class PositionTile extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Bagian Avatar
+            // Avatar
             CircleAvatar(
               radius: 28,
               backgroundColor: Colors.blueGrey.shade50,
@@ -51,7 +59,8 @@ class PositionTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            // Bagian Informasi Teks
+
+            // Informasi Text
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,24 +74,28 @@ class PositionTile extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
+
+                  // Rate Reguler
                   Row(
                     children: [
                       const Icon(Icons.monetization_on_outlined,
                           size: 14, color: Colors.grey),
                       const SizedBox(width: 4),
                       Text(
-                        "Reg: ${item.rateReguler ?? 0}",
+                        "Reg: ${currency.format((item.rateReguler ?? 0).toDouble())}",
                         style: TextStyle(color: Colors.grey[600], fontSize: 13),
                       ),
                     ],
                   ),
+
+                  // Rate Overtime
                   Row(
                     children: [
                       const Icon(Icons.access_time,
                           size: 14, color: Colors.grey),
                       const SizedBox(width: 4),
                       Text(
-                        "OT: ${item.rateOvertime ?? 0}",
+                        "OT: ${currency.format((item.rateOvertime ?? 0).toDouble())}",
                         style: TextStyle(color: Colors.grey[600], fontSize: 13),
                       ),
                     ],
@@ -90,7 +103,8 @@ class PositionTile extends StatelessWidget {
                 ],
               ),
             ),
-            // Icon Panah kecil
+
+            // Icon Panah
             const Icon(Icons.chevron_right, color: Colors.grey),
           ],
         ),
