@@ -52,7 +52,8 @@ class BarChartWidget extends StatelessWidget {
       titlesData: FlTitlesData(
         show: true,
         rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)), 
+
 
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
