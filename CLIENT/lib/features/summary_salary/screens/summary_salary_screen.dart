@@ -426,33 +426,33 @@ class _SummarySalaryScreenState extends State<SummarySalaryScreen> {
     required String title,
     required List<DepartmentChartData> data,
     required String type,
-}) {
+  }) {
     return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-            Text(
-                title,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            // Hapus Container styling lama, dan biarkan BarChartWidget yang mengambil alih ruang
-            Container(
-                height: 250,
-                decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                        BoxShadow(
-                            blurRadius: 6,
-                            offset: const Offset(0, 3),
-                            color: Colors.grey.withOpacity(0.2),
-                        ),
-                    ],
-                ),
-                // BarChartWidget yang sudah difix akan menangani padding internal
-                child: BarChartWidget(data: data, type: type),
-            ),
-        ],
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
+        // Hapus Container styling lama, dan biarkan BarChartWidget yang mengambil alih ruang
+        Container(
+          height: 250,
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+                color: Colors.grey.withOpacity(0.2),
+              ),
+            ],
+          ),
+          // BarChartWidget yang sudah difix akan menangani padding internal
+          child: BarChartWidget(data: data, type: type),
+        ),
+      ],
     );
-}
+  }
 }

@@ -51,15 +51,10 @@ class _PositionScreenState extends State<PositionScreen> {
           "MASTER POSITIONS",
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
-        backgroundColor: Colors.blueAccent, // Warna Biru sesuai referensi
+        backgroundColor: Theme.of(context).colorScheme.primary,
+
         foregroundColor: Colors.white,
-        elevation: 0,
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.notifications_none),
-          ),
-        ],
+        // elevation: 0,
       ),
       body: Column(
         children: [
@@ -114,7 +109,8 @@ class _PositionScreenState extends State<PositionScreen> {
         child: ElevatedButton(
           onPressed: () => _navigateToForm(),
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blueAccent,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
             minimumSize: const Size(double.infinity, 50),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -125,7 +121,6 @@ class _PositionScreenState extends State<PositionScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
             ),
           ),
         ),

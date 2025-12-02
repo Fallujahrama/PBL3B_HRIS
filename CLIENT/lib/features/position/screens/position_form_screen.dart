@@ -14,7 +14,7 @@ class PositionFormScreen extends StatefulWidget {
 
 class _PositionFormScreenState extends State<PositionFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  
+
   // Controllers
   late TextEditingController _nameController;
   late TextEditingController _rateRegulerController;
@@ -33,9 +33,11 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
     // Inisialisasi controller dengan data jika mode edit
     _nameController = TextEditingController(text: widget.position?.name ?? '');
     _rateRegulerController = TextEditingController(
-        text: widget.position?.rateReguler?.toString() ?? '');
+      text: widget.position?.rateReguler?.toString() ?? '',
+    );
     _rateOvertimeController = TextEditingController(
-        text: widget.position?.rateOvertime?.toString() ?? '');
+      text: widget.position?.rateOvertime?.toString() ?? '',
+    );
 
     // Inisialisasi readOnly berdasarkan apakah ada position (edit) atau tidak (create)
     _readOnly = widget.position != null;
@@ -72,14 +74,14 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
     setState(() => _isLoading = false);
 
     if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Data berhasil disimpan!")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Data berhasil disimpan!")));
       context.pop(true); // Kembali ke list dan refresh
     } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Gagal menyimpan data.")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Gagal menyimpan data.")));
     }
   }
 
@@ -90,8 +92,14 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
         title: const Text("Hapus Posisi"),
         content: const Text("Apakah Anda yakin ingin menghapus posisi ini?"),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text("Batal")),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text("Hapus", style: TextStyle(color: Colors.red))),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text("Batal"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text("Hapus", style: TextStyle(color: Colors.red)),
+          ),
         ],
       ),
     );
@@ -99,14 +107,14 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
     if (confirm == true && widget.position != null) {
       setState(() => _isLoading = true);
       final success = await PositionApi.deletePosition(widget.position!.id);
-      
+
       if (success && mounted) {
         context.pop(true); // Kembali dan refresh
       } else if (mounted) {
         setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Gagal menghapus data.")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Gagal menghapus data.")));
       }
     }
   }
@@ -138,7 +146,10 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
           decoration: InputDecoration(
             filled: true,
             fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 14,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(color: Colors.grey.shade300),
@@ -162,8 +173,8 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
       backgroundColor: const Color(0xFFF5F6F8), // Background abu-abu muda
       appBar: AppBar(
         title: Text(isEdit ? "Position Detail" : "Tambah Position"),
-        backgroundColor: Colors.blueAccent, // Warna biru header
-        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -177,20 +188,36 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
                 const SizedBox(height: 10),
                 const CircleAvatar(
                   radius: 40,
-                  backgroundImage: NetworkImage('https://ui-avatars.com/api/?name=Job+Position&background=0D8ABC&color=fff'), 
+                  backgroundImage: NetworkImage(
+                    'https://ui-avatars.com/api/?name=Job+Position&background=0D8ABC&color=fff',
+                  ),
                 ),
                 const SizedBox(height: 10),
                 Text(
                   widget.position!.name ?? "-",
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 20),
               ],
 
               // Form Fields (enabled mengikuti _readOnly)
-              _buildTextField(label: "Nama Posisi", controller: _nameController),
-              _buildTextField(label: "Rate Reguler", controller: _rateRegulerController, isNumber: true),
-              _buildTextField(label: "Rate Overtime", controller: _rateOvertimeController, isNumber: true),
+              _buildTextField(
+                label: "Nama Posisi",
+                controller: _nameController,
+              ),
+              _buildTextField(
+                label: "Rate Reguler",
+                controller: _rateRegulerController,
+                isNumber: true,
+              ),
+              _buildTextField(
+                label: "Rate Overtime",
+                controller: _rateOvertimeController,
+                isNumber: true,
+              ),
 
               const SizedBox(height: 20),
 
@@ -208,7 +235,11 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
                               _readOnly = false;
                             });
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Mode edit aktif. Silakan ubah data lalu tekan Update lagi untuk menyimpan.")),
+                              const SnackBar(
+                                content: Text(
+                                  "Mode edit aktif. Silakan ubah data lalu tekan Update lagi untuk menyimpan.",
+                                ),
+                              ),
                             );
                             return;
                           }
@@ -217,7 +248,9 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
                           _submitForm();
                         },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
+                    
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -227,7 +260,11 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
                       // Tetap pakai label "Update" sesuai permintaan user saat edit; saat create tampil "Simpan"
                       : Text(
                           isEdit ? "Update" : "Simpan",
-                          style: const TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                 ),
               ),
@@ -241,12 +278,19 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
                   child: TextButton(
                     onPressed: _isLoading ? null : _deletePosition,
                     style: TextButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
+                      backgroundColor: Theme.of(context).colorScheme.error,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text("Delete", style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold)),
+                    child: const Text(
+                      "Delete",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ],
