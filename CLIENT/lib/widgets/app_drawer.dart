@@ -36,14 +36,22 @@ class AppDrawer extends StatelessWidget {
             onTap: () => context.go('/positions'),
           ),
           
+       
+
+          //  MENU BARU: DEPARTMENT
           ListTile(
+            leading: const Icon(Icons.apartment),
+            title: const Text("Department"),
+            onTap: () => context.go('/departments'),
+          ),
+          
+             ListTile(
             leading: const Icon(Icons.article),
             title: const Text("Laporan Gaji Pegawai"),
             onTap: () => context.go('/summary-salary'),
           ),
-          
         ],
       ),
     );
   }
-}
+} 

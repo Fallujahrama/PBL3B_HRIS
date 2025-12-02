@@ -6,5 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Department extends Model
 {
+    protected $fillable = [
+        'name',
+        'radius',
+        'latitude',
+        'longitude',
+    ];
     protected $table = 'departments';
 }
