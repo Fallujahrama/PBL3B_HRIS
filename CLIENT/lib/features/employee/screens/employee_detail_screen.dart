@@ -72,7 +72,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Employee deleted successfully')),
         );
-        context.pop();
+        context.pop(true);
       }
     } catch (e) {
       if (mounted) {
@@ -123,75 +123,97 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
     }
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       child: Column(
         children: [
+          // Avatar
           CircleAvatar(
-            radius: 60,
+            radius: 70,
             backgroundColor: Colors.blue.shade100,
             child: Text(
               _employee!.firstName[0].toUpperCase(),
-              style: const TextStyle(fontSize: 40, color: Colors.blue, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 48, color: Colors.blue, fontWeight: FontWeight.bold),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
 
+          // Full Name
           Text(
             _employee!.fullName,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 30),
 
+          // Information Card dengan layout yang lebih besar dan rapih
           Card(
+            elevation: 3,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(24),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildDetailRow('Nama Depan', _employee!.firstName),
-                  const Divider(),
+                  const Divider(height: 32, thickness: 1),
+                  
                   _buildDetailRow('Nama Belakang', _employee!.lastName),
-                  const Divider(),
-                  _buildDetailRow('Gender', _employee!.gender),
-                  const Divider(),
+                  const Divider(height: 32, thickness: 1),
+                  
+                  _buildDetailRow(
+                    'Gender', 
+                    _employee!.gender == 'M' ? 'Laki-laki' : 'Perempuan'
+                  ),
+                  const Divider(height: 32, thickness: 1),
+                  
                   _buildDetailRow('Posisi', _employee!.position?.name ?? '-'),
-                  const Divider(),
+                  const Divider(height: 32, thickness: 1),
+                  
                   _buildDetailRow('Departemen', _employee!.department?.name ?? '-'),
-                  const Divider(),
+                  const Divider(height: 32, thickness: 1),
+                  
                   _buildDetailRow('Alamat', _employee!.address ?? '-'),
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 30),
 
+          // Action Buttons
           Row(
             children: [
               Expanded(
                 child: SizedBox(
-                  height: 50,
-                  child: ElevatedButton(
+                  height: 52,
+                  child: ElevatedButton.icon(
                     onPressed: () {
                       context.push('/employee/edit/${widget.employeeId}').then((_) => _loadEmployee());
                     },
+                    icon: const Icon(Icons.edit, color: Colors.white),
+                    label: const Text('Update', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      elevation: 2,
                     ),
-                    child: const Text('Update', style: TextStyle(fontSize: 16, color: Colors.white)),
                   ),
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: SizedBox(
-                  height: 50,
-                  child: ElevatedButton(
+                  height: 52,
+                  child: ElevatedButton.icon(
                     onPressed: _deleteEmployee,
+                    icon: const Icon(Icons.delete, color: Colors.white),
+                    label: const Text('Delete', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      elevation: 2,
                     ),
-                    child: const Text('Delete', style: TextStyle(fontSize: 16, color: Colors.white)),
                   ),
                 ),
               ),
@@ -202,16 +224,31 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
     );
   }
 
+  // Widget untuk menampilkan label di atas dan value di bawah dengan spacing yang lebih baik
   Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: const TextStyle(fontSize: 16, color: Colors.grey)),
-          Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.grey[600],
+            fontWeight: FontWeight.w500,
+            letterSpacing: 0.5,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+            height: 1.3,
+          ),
+        ),
+      ],
     );
   }
 }

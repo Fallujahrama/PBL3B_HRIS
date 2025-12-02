@@ -4,7 +4,7 @@ import '../models/employee_model.dart';
 
 class EmployeeApiService {
   // Ganti dengan URL API Laravel Anda
-  static const String baseUrl = 'http://127.0.0.1:8000/api';
+  static const String baseUrl = 'http://192.168.66.90:8000/api';
   
   // Get all employees
   Future<List<Employee>> getAllEmployees() async {
@@ -45,8 +45,9 @@ class EmployeeApiService {
     }
   }
 
-  // Create new employee
-  Future<Employee> createEmployee(Employee employee) async {
+  // Create new employee with user account
+  // UPDATED: Sekarang menerima Map<String, dynamic> untuk mengirim data user + employee
+  Future<void> createEmployee(Map<String, dynamic> data) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/employees'),
@@ -54,12 +55,12 @@ class EmployeeApiService {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
-        body: json.encode(employee.toJson()),
+        body: json.encode(data),
       );
 
       if (response.statusCode == 201) {
-        final jsonData = json.decode(response.body);
-        return Employee.fromJson(jsonData['data']);
+        // Success
+        return;
       } else {
         final errorData = json.decode(response.body);
         throw Exception(errorData['message'] ?? 'Failed to create employee');
@@ -69,29 +70,29 @@ class EmployeeApiService {
     }
   }
 
-  // Update employee
-  Future<Employee> updateEmployee(int id, Employee employee) async {
-    try {
-      final response = await http.put(
-        Uri.parse('$baseUrl/employees/$id'),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: json.encode(employee.toJson()),
-      );
+// Update employee - GANTI METHOD INI di employee_api_service.dart
+Future<void> updateEmployee(int id, Map<String, dynamic> data) async {
+  try {
+    final response = await http.put(
+      Uri.parse('$baseUrl/employees/$id'),
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(data),
+    );
 
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
-        return Employee.fromJson(jsonData['data']);
-      } else {
-        final errorData = json.decode(response.body);
-        throw Exception(errorData['message'] ?? 'Failed to update employee');
-      }
-    } catch (e) {
-      throw Exception('Error updating employee: $e');
+    if (response.statusCode == 200) {
+      // Success
+      return;
+    } else {
+      final errorData = json.decode(response.body);
+      throw Exception(errorData['message'] ?? 'Failed to update employee');
     }
+  } catch (e) {
+    throw Exception('Error updating employee: $e');
   }
+}
 
   // Delete employee
   Future<void> deleteEmployee(int id) async {
@@ -110,30 +111,43 @@ class EmployeeApiService {
     }
   }
 
+  // Fetch departments
   Future<List<Department>> fetchDepartments() async {
-  final response = await http.get(Uri.parse('http://127.0.0.1:8000/api/employee/department'));
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/employee/department'),
+        headers: {'Accept': 'application/json'},
+      );
 
-  if (response.statusCode == 200) {
-    final jsonData = json.decode(response.body);
-    List data = jsonData['data'];
-
-    return data.map((d) => Department.fromJson(d)).toList();
-  } else {
-    throw Exception('Gagal memuat daftar department');
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        List data = jsonData['data'];
+        return data.map((d) => Department.fromJson(d)).toList();
+      } else {
+        throw Exception('Gagal memuat daftar department');
+      }
+    } catch (e) {
+      throw Exception('Error fetching departments: $e');
+    }
   }
-}
 
-Future<List<Position>> fetchPositions() async {
-  final response = await http.get(Uri.parse('http://127.0.0.1:8000/api/employee/position'));
+  // Fetch positions
+  Future<List<Position>> fetchPositions() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/employee/position'),
+        headers: {'Accept': 'application/json'},
+      );
 
-  if (response.statusCode == 200) {
-    final jsonData = json.decode(response.body);
-    List data = jsonData['data'];
-
-    return data.map((p) => Position.fromJson(p)).toList();
-  } else {
-    throw Exception('Gagal memuat daftar position');
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        List data = jsonData['data'];
+        return data.map((p) => Position.fromJson(p)).toList();
+      } else {
+        throw Exception('Gagal memuat daftar position');
+      }
+    } catch (e) {
+      throw Exception('Error fetching positions: $e');
+    }
   }
-}
-
 }

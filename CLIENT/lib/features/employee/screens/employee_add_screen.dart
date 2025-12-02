@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../models/employee_model.dart';
-// import '../models/department_model.dart';     // NEW
-// import '../models/position_model.dart';       // NEW
-
 import '../services/employee_api_service.dart';
 
 class EmployeeAddScreen extends StatefulWidget {
@@ -18,47 +15,49 @@ class _EmployeeAddScreenState extends State<EmployeeAddScreen> {
   final _formKey = GlobalKey<FormState>();
   final _apiService = EmployeeApiService();
 
+  // User fields
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isAdmin = false;
+
+  // Employee fields
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _addressController = TextEditingController();
 
   String _selectedGender = 'L';
-  int? _selectedPositionId; // NEW
-  int? _selectedDepartmentId; // NEW
-  int _userId = 1;
-
-  String _email = "";
-String _password = "";
-bool _isAdmin = false;
-
+  int? _selectedPositionId;
+  int? _selectedDepartmentId;
 
   bool _isLoading = false;
 
-  // ========== NEW: Data dari API ==========
-  List<Position> _positions = []; // NEW
-  List<Department> _departments = []; // NEW
+  List<Position> _positions = [];
+  List<Department> _departments = [];
 
   @override
   void initState() {
     super.initState();
-    _loadMasterData(); // NEW
+    _loadMasterData();
   }
 
-  // ========== NEW: fetch data Position & Department ==========
   Future<void> _loadMasterData() async {
     try {
       _positions = await _apiService.fetchPositions();
       _departments = await _apiService.fetchDepartments();
       setState(() {});
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Gagal memuat data master: $e")));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Gagal memuat data master: $e")),
+        );
+      }
     }
   }
 
   @override
   void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
     _firstNameController.dispose();
     _lastNameController.dispose();
     _addressController.dispose();
@@ -78,32 +77,35 @@ bool _isAdmin = false;
     setState(() => _isLoading = true);
 
     try {
-      final employee = Employee(
-        id: 0,
-        userId: _userId,
-        firstName: _firstNameController.text,
-        lastName: _lastNameController.text,
-        gender: _selectedGender,
-        positionId: _selectedPositionId,
-        departmentId: _selectedDepartmentId,
-        address: _addressController.text.isEmpty
-            ? null
-            : _addressController.text,
-      );
+      // Data yang dikirim ke API sesuai dengan Laravel Controller
+      final requestData = {
+        // User data
+        'email': _emailController.text,
+        'password': _passwordController.text,
+        'is_admin': _isAdmin,
+        
+        // Employee data
+        'first_name': _firstNameController.text,
+        'last_name': _lastNameController.text,
+        'gender': _selectedGender,
+        'position_id': _selectedPositionId,
+        'department_id': _selectedDepartmentId,
+        'address': _addressController.text.isEmpty ? null : _addressController.text,
+      };
 
-      await _apiService.createEmployee(employee);
+      await _apiService.createEmployee(requestData);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Employee added successfully')),
+          const SnackBar(content: Text('Employee berhasil ditambahkan')),
         );
         context.pop();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
       }
     } finally {
       if (mounted) {
@@ -126,213 +128,264 @@ bool _isAdmin = false;
       body: Form(
         key: _formKey,
         child: ListView(
-  padding: const EdgeInsets.all(16),
-  children: [
+          padding: const EdgeInsets.all(16),
+          children: [
+            // =====================================
+            // CARD: USER ACCOUNT
+            // =====================================
+            Card(
+              elevation: 3,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'User Account',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 16),
 
-    // =====================================
-    // SECTION: USER ACCOUNT
-    // =====================================
-    const Text(
-      'User Account',
-      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-    ),
-    const SizedBox(height: 12),
+                    // Email
+                    const Text('Email', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Enter email',
+                        prefixIcon: Icon(Icons.email),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) return 'Email is required';
+                        if (!value.contains('@')) return 'Email tidak valid';
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
 
-    // Email
-    const Text('Email', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-    const SizedBox(height: 8),
-    TextFormField(
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        hintText: 'Enter email',
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) return 'Email is required';
-        return null;
-      },
-      onChanged: (v) => _email = v,
-    ),
-    const SizedBox(height: 16),
+                    // Password
+                    const Text('Password', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Enter password (min. 6 characters)',
+                        prefixIcon: Icon(Icons.lock),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) return 'Password is required';
+                        if (value.length < 6) return 'Password minimal 6 karakter';
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
 
-    // Password
-    const Text('Password', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-    const SizedBox(height: 8),
-    TextFormField(
-      obscureText: true,
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        hintText: 'Enter password',
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) return 'Password is required';
-        return null;
-      },
-      onChanged: (v) => _password = v,
-    ),
-    const SizedBox(height: 16),
+                    // Toggle is admin
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Is Admin', style: TextStyle(fontSize: 16)),
+                          Switch(
+                            value: _isAdmin,
+                            onChanged: (value) {
+                              setState(() => _isAdmin = value);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
 
-    // Toggle is admin
-    Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const Text('Is Admin', style: TextStyle(fontSize: 16)),
-        Switch(
-          value: _isAdmin,
-          onChanged: (value) {
-            setState(() => _isAdmin = value);
-          },
-        )
-      ],
-    ),
+            const SizedBox(height: 20),
 
-    const Divider(height: 32, thickness: 2),
+            // =====================================
+            // CARD: EMPLOYEE INFORMATION
+            // =====================================
+            Card(
+              elevation: 3,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Employee Information',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 16),
 
-    // =====================================
-    // SECTION: EMPLOYEE
-    // =====================================
-    const Text(
-      'Employee Information',
-      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-    ),
-    const SizedBox(height: 12),
+                    // First name
+                    const Text('Nama Depan', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _firstNameController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Enter first name',
+                        prefixIcon: Icon(Icons.person),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) return 'Nama depan wajib diisi';
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
 
-    // ============================
-    // First name
-    // ============================
-    const Text('Nama Depan', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-    const SizedBox(height: 8),
-    TextFormField(
-      controller: _firstNameController,
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        hintText: 'Enter first name',
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) return 'Please enter first name';
-        return null;
-      },
-    ),
-    const SizedBox(height: 16),
+                    // Last name
+                    const Text('Nama Belakang', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _lastNameController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Enter last name',
+                        prefixIcon: Icon(Icons.person_outline),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) return 'Nama belakang wajib diisi';
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
 
-    // ============================
-    // Last name
-    // ============================
-    const Text('Nama Belakang', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-    const SizedBox(height: 8),
-    TextFormField(
-      controller: _lastNameController,
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        hintText: 'Enter last name',
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) return 'Please enter last name';
-        return null;
-      },
-    ),
-    const SizedBox(height: 16),
+                    // Gender
+                    const Text('Gender', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: RadioListTile<String>(
+                              title: const Text('L'),
+                              value: 'M',
+                              groupValue: _selectedGender,
+                              onChanged: (value) => setState(() => _selectedGender = value!),
+                            ),
+                          ),
+                          Expanded(
+                            child: RadioListTile<String>(
+                              title: const Text('P'),
+                              value: 'F',
+                              groupValue: _selectedGender,
+                              onChanged: (value) => setState(() => _selectedGender = value!),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
 
-    // ============================
-    // Gender
-    // ============================
-    const Text('Gender', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-    const SizedBox(height: 8),
-    Row(
-      children: [
-        Expanded(
-          child: RadioListTile<String>(
-            title: const Text('M'),
-            value: 'L',
-            groupValue: _selectedGender,
-            onChanged: (value) => setState(() => _selectedGender = value!),
-          ),
+                    // Position
+                    const Text('Posisi', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 8),
+                    DropdownButtonFormField<int>(
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.work),
+                      ),
+                      hint: const Text('Select position'),
+                      value: _selectedPositionId,
+                      items: _positions.map((pos) {
+                        return DropdownMenuItem<int>(
+                          value: pos.id,
+                          child: Text(pos.name),
+                        );
+                      }).toList(),
+                      onChanged: (value) => setState(() => _selectedPositionId = value),
+                      validator: (value) {
+                        if (value == null) return 'Posisi wajib dipilih';
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Department
+                    const Text('Departemen', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 8),
+                    DropdownButtonFormField<int>(
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.business),
+                      ),
+                      hint: const Text('Select department'),
+                      value: _selectedDepartmentId,
+                      items: _departments.map((dept) {
+                        return DropdownMenuItem<int>(
+                          value: dept.id,
+                          child: Text(dept.name),
+                        );
+                      }).toList(),
+                      onChanged: (value) => setState(() => _selectedDepartmentId = value),
+                      validator: (value) {
+                        if (value == null) return 'Departemen wajib dipilih';
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Address
+                    const Text('Alamat', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _addressController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Enter address (optional)',
+                        prefixIcon: Icon(Icons.home),
+                      ),
+                      maxLines: 3,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // SAVE BUTTON
+            SizedBox(
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _saveEmployee,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
+                        'Simpan',
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+              ),
+            ),
+          ],
         ),
-        Expanded(
-          child: RadioListTile<String>(
-            title: const Text('F'),
-            value: 'P',
-            groupValue: _selectedGender,
-            onChanged: (value) => setState(() => _selectedGender = value!),
-          ),
-        ),
-      ],
-    ),
-    const SizedBox(height: 16),
-
-    // ============================
-    // Position
-    // ============================
-    const Text('Posisi', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-    const SizedBox(height: 8),
-    DropdownButtonFormField<int>(
-      decoration: const InputDecoration(border: OutlineInputBorder()),
-      hint: const Text('Select position'),
-      value: _selectedPositionId,
-      items: _positions.map((pos) {
-        return DropdownMenuItem<int>(
-          value: pos.id,
-          child: Text(pos.name),
-        );
-      }).toList(),
-      onChanged: (value) => setState(() => _selectedPositionId = value),
-    ),
-    const SizedBox(height: 16),
-
-    // ============================
-    // Department
-    // ============================
-    const Text('Departemen', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-    const SizedBox(height: 8),
-    DropdownButtonFormField<int>(
-      decoration: const InputDecoration(border: OutlineInputBorder()),
-      hint: const Text('Select department'),
-      value: _selectedDepartmentId,
-      items: _departments.map((dept) {
-        return DropdownMenuItem<int>(
-          value: dept.id,
-          child: Text(dept.name),
-        );
-      }).toList(),
-      onChanged: (value) => setState(() => _selectedDepartmentId = value),
-    ),
-    const SizedBox(height: 16),
-
-    // ============================
-    // Address
-    // ============================
-    const Text('Alamat', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-    const SizedBox(height: 8),
-    TextFormField(
-      controller: _addressController,
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        hintText: 'Enter address',
-      ),
-      maxLines: 3,
-    ),
-    const SizedBox(height: 32),
-
-    // ============================
-    // SAVE BUTTON
-    // ============================
-    SizedBox(
-      height: 50,
-      child: ElevatedButton(
-        onPressed: _isLoading ? null : _saveEmployee,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-        child: _isLoading
-            ? const CircularProgressIndicator(color: Colors.white)
-            : const Text('Simpan', style: TextStyle(fontSize: 16, color: Colors.white)),
-      ),
-    ),
-  ],
-),
-
       ),
     );
   }

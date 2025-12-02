@@ -50,12 +50,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
         title: const Text('EMPLOYEES', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.blue,
         iconTheme: const IconThemeData(color: Colors.white),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {},
-          ),
-        ],
+
       ),
       drawer: const AppDrawer(),
       body: _buildBody(),
@@ -66,18 +61,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
         backgroundColor: Colors.blue,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: 0,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Users'),
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Calendar'),
-          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Chart'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Gear'),
-        ],
-      ),
+
     );
   }
 

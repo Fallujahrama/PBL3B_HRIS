@@ -62,15 +62,19 @@ class Employee {
   }
 }
 
+// GANTI class User di employee_model.dart dengan yang ini:
+
 class User {
   final int id;
   final String name;
   final String email;
+  final bool isAdmin;  // ← TAMBAH PROPERTI INI
 
   User({
     required this.id,
     required this.name,
     required this.email,
+    required this.isAdmin,  // ← TAMBAH DI CONSTRUCTOR
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -78,7 +82,17 @@ class User {
       id: json['id'] ?? 0,
       name: json['name'] ?? '',
       email: json['email'] ?? '',
+      isAdmin: json['is_admin'] == 1 || json['is_admin'] == true,  // ← PARSE is_admin
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'is_admin': isAdmin,  // ← TAMBAH DI toJson
+    };
   }
 }
 
