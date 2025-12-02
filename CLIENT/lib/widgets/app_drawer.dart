@@ -36,13 +36,18 @@ class AppDrawer extends StatelessWidget {
             onTap: () => context.go('/positions'),
           ),
           
-       
 
-          //  MENU BARU: DEPARTMENT
           ListTile(
             leading: const Icon(Icons.apartment),
             title: const Text("Department"),
             onTap: () => context.go('/departments'),
+          ),
+          
+          //  MENU BARU: DEPARTMENT
+          ListTile(
+            leading: const Icon(Icons.people),
+            title: const Text("Employees"),
+            onTap: () => context.go('/employee'),
           ),
           
              ListTile(

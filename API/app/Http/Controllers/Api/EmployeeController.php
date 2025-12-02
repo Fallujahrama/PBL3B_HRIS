@@ -41,48 +41,79 @@ class EmployeeController extends Controller
         }
     }
 
-    /**
-     * Simpan data karyawan baru (Create).
+        /**
+     * Tambah karyawan baru + buat user terlebih dahulu.
      */
-    public function store(Request $request) // Ganti dengan StoreEmployeeRequest $request jika sudah dibuat
+    public function store(Request $request)
     {
-        // Contoh sederhana validasi (sebaiknya pindahkan ke Form Request)
+        // Validasi request
         $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:users,id',
-            'first_name' => 'required|string|max:100',
-            'last_name' => 'required|string|max:100',
-            'gender' => 'required|in:L,P', // Laki-laki atau Perempuan
-            'position_id' => 'nullable|exists:positions,id',
-            'department_id' => 'nullable|exists:departments,id',
-            'address' => 'nullable|string',
+            // USER
+            'email'         => 'required|email|unique:users,email',
+            'password'      => 'required|min:6',
+            'is_admin'      => 'boolean',
+
+            // EMPLOYEE
+            'first_name'        => 'required|string|max:100',
+            'last_name'         => 'required|string|max:100',
+            'gender'            => 'required|in:M,F',
+            'position_id'       => 'required|integer',
+            'department_id'     => 'required|integer',
+            'address'           => 'nullable|string'
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal.',
-                'errors' => $validator->errors()
-            ], Response::HTTP_UNPROCESSABLE_ENTITY); // 422 Unprocessable Entity
+                'message' => 'Validasi gagal',
+                'errors'  => $validator->errors()
+            ], Response::HTTP_UNPROCESSABLE_ENTITY); // 422
         }
 
-        try {
-            $employee = Employee::create($request->validated()); // Gunakan $request->validated() jika pakai Form Request
+        DB::beginTransaction();
 
-            // Ambil data lengkap karyawan yang baru disimpan untuk respons
-            $employee->load(['user', 'position', 'department']);
+        try {
+            // 1️⃣ Buat User terlebih dahulu
+            $user = \App\Models\User::create([
+                'email'     => $request->email,
+                'password'  => bcrypt($request->password),
+                'is_admin'  => $request->is_admin ?? false
+            ]);
+
+            // 2️⃣ Buat Employee memakai user_id
+            $employee = Employee::create([
+                'user_id'       => $user->id,
+                'first_name'    => $request->first_name,
+                'last_name'    => $request->last_name,
+                'position_id'   => $request->position_id,
+                'gender' => $request -> gender,
+                'department_id' => $request->department_id,
+                'address'       => $request->address
+            ]);
+
+
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Data karyawan berhasil ditambahkan.',
-                'data' => $employee
-            ], Response::HTTP_CREATED); // 201 Created
+                'message' => 'Karyawan berhasil ditambahkan',
+                'data'    => [
+                    'user'      => $user,
+                    'employee'  => $employee
+                ]
+            ], Response::HTTP_CREATED); // 201
+
         } catch (\Exception $e) {
-            Log::error('Error creating employee: ' . $e->getMessage());
+
+            DB::rollBack();
+            Log::error('Error creating employee: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal menyimpan data karyawan.',
-                'error' => $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR); // 500 Internal Server Error
+                'message' => 'Gagal menambah karyawan',
+                'error'   => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -120,57 +151,69 @@ class EmployeeController extends Controller
     /**
      * Perbarui data karyawan (Update).
      */
-    public function update(Request $request, $id) // Ganti dengan UpdateEmployeeRequest $request jika sudah dibuat
+    public function update(Request $request, $id)
     {
-        $employee = Employee::find($id);
-
+        $employee = Employee::with('user')->find($id);
+    
         if (!$employee) {
             return response()->json([
                 'success' => false,
                 'message' => 'Karyawan tidak ditemukan.'
-            ], Response::HTTP_NOT_FOUND); // 404 Not Found
+            ], Response::HTTP_NOT_FOUND);
         }
-
-        // Contoh sederhana validasi (sebaiknya pindahkan ke Form Request)
+    
+        // Validasi UPDATE (disesuaikan dengan database kamu)
         $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:users,id',
-            'first_name' => 'required|string|max:100',
-            'last_name' => 'required|string|max:100',
-            'gender' => 'required|in:L,P',
-            'position_id' => 'nullable|exists:positions,id',
-            'department_id' => 'nullable|exists:departments,id',
-            'address' => 'nullable|string',
+    
+            // USER
+            'email'     => 'required|email|unique:users,email,' . $employee->user->id,
+            'password'  => 'nullable|min:6',
+            'is_admin'  => 'boolean',
+    
+            // EMPLOYEE
+            'first_name'    => 'required|string|max:100',
+            'last_name'     => 'required|string|max:100',
+            'gender'        => 'required|in:M,F',
+            'position_id'   => 'required|exists:positions,id',
+            'department_id' => 'required|exists:departments,id',
+            'address'       => 'nullable|string',
         ]);
-
+    
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Validasi gagal.',
                 'errors' => $validator->errors()
-            ], Response::HTTP_UNPROCESSABLE_ENTITY); // 422 Unprocessable Entity
+            ], Response::HTTP_UNPROCESSABLE_ENTITY); 
         }
-
-        try {
-            $employee->update($request->validated()); // Gunakan $request->validated() jika pakai Form Request
-
-            // Muat ulang (reload) relasi setelah update
-            $employee->load(['user', 'position', 'department']);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Data karyawan berhasil diperbarui.',
-                'data' => $employee
-            ], Response::HTTP_OK); // 200 OK
-        } catch (\Exception $e) {
-            Log::error('Error updating employee: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal memperbarui data karyawan.',
-                'error' => $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR); // 500 Internal Server Error
+    
+        // === UPDATE USER ===
+        $employee->user->email = $request->email;
+        $employee->user->is_admin = $request->is_admin ?? $employee->user->is_admin;
+    
+        if ($request->filled('password')) {
+            $employee->user->password = bcrypt($request->password);
         }
+    
+        $employee->user->save();
+    
+        // === UPDATE EMPLOYEE ===
+        $employee->update([
+            'first_name'    => $request->first_name,
+            'last_name'     => $request->last_name,
+            'gender'        => $request->gender,
+            'position_id'   => $request->position_id,
+            'department_id' => $request->department_id,
+            'address'       => $request->address,
+        ]);
+    
+        return response()->json([
+            'success' => true,
+            'message' => 'Data karyawan berhasil diperbarui.',
+            'data' => $employee->load('user', 'position', 'department')
+        ]);
     }
-
+    
     /**
      * Hapus data karyawan (Delete).
      */
@@ -201,4 +244,43 @@ class EmployeeController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR); // 500 Internal Server Error
         }
     }
+
+    public function getDepartments()
+    {
+        try {
+            $departments = \App\Models\Department::all();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Daftar department berhasil diambil.',
+                'data' => $departments
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengambil data department.',
+                'error' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function getPositions()
+    {
+        try {
+            $positions = \App\Models\Position::all();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Daftar position berhasil diambil.',
+                'data' => $positions
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengambil data position.',
+                'error' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
