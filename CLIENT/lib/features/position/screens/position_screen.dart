@@ -48,12 +48,10 @@ class _PositionScreenState extends State<PositionScreen> {
       drawer: const AppDrawer(),
       appBar: AppBar(
         title: const Text(
-          "MASTER POSITIONS",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          "Master Posisi",
         ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
         // elevation: 0,
       ),
       body: Column(

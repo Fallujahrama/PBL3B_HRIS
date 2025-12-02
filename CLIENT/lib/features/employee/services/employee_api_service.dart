@@ -4,7 +4,7 @@ import '../models/employee_model.dart';
 
 class EmployeeApiService {
   // Ganti dengan URL API Laravel Anda
-  static const String baseUrl = 'http://192.168.66.90:8000/api';
+  static const String baseUrl = 'http://127.0.0.1:8000/api';
   
   // Get all employees
   Future<List<Employee>> getAllEmployees() async {
