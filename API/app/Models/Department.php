@@ -12,4 +12,5 @@ class Department extends Model
         'latitude',
         'longitude',
     ];
+    protected $table = 'departments';
 }

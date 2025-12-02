@@ -18,5 +18,8 @@ class DatabaseSeeder extends Seeder
             //LettersSeeder::class,
             DepartmentSeeder::class,
         ]);
+        //$this->call(LetterFormatsSeeder::class);
+        //$this->call(LettersSeeder::class);
+        $this->call(PositionSeeder::class);
     }
 }

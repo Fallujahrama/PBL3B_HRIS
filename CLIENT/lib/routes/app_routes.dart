@@ -1,8 +1,11 @@
 import 'package:go_router/go_router.dart';
-
+import 'package:tracer_study_test_api/features/summary_salary/screens/summary_salary_screen.dart';
 import '../features/splash/screens/splash_screen.dart';
 import '../features/home/screens/home_screen.dart';
 import '../features/superior/screens/superior_screen.dart';
+import '../features/position/screens/position_screen.dart';
+import '../features/position/screens/position_form_screen.dart'; // Import baru
+import '../features/position/models/position.dart'; // Import model
 import '../features/department/screens/department_list_page.dart';
 import '../features/department/screens/department_detail_page.dart';
 import '../features/department/screens/department_form_page.dart';
@@ -28,9 +31,24 @@ class AppRoutes {
         builder: (context, state) => const HomeScreen(),
       ),
       GoRoute(
-        path: '/superior',
-        name: 'superior',
-        builder: (context, state) => const SuperiorScreen(),
+        path: '/summary-salary',
+        name: 'summary-salary',
+        builder: (context, state) => const SummarySalaryScreen(),
+      ),
+      GoRoute(
+        path: '/positions',
+        builder: (context, state) => const PositionScreen(),
+        routes: [
+          // Sub-route untuk Form (Tambah/Edit)
+          GoRoute(
+            path: 'form',
+            builder: (context, state) {
+              // Mengambil objek position yang dikirim via 'extra'
+              Position? position = state.extra as Position?;
+              return PositionFormScreen(position: position);
+            },
+          ),
+        ],
       ),
       GoRoute(
         path: '/departments',
@@ -54,5 +72,7 @@ class AppRoutes {
         },
       ),
     ],
+
+    
   );
 }
