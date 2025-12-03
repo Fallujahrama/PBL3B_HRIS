@@ -10,12 +10,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const primaryBlue = Color.fromARGB(255, 0, 140, 255);
+    final lightColorScheme = ColorScheme.fromSeed(
+        seedColor: primaryBlue,
+        brightness: Brightness.light, // Pastikan ini mode terang
+    );
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       routerConfig: AppRoutes.router,
+      themeMode: ThemeMode.light,
       theme: ThemeData(
         useMaterial3: true,
-        colorSchemeSeed: Colors.blue, // Primary biru
+        colorScheme: lightColorScheme, // Gunakan skema yang dihasilkan
       ),
     );
   }

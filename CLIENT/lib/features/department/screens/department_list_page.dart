@@ -21,6 +21,12 @@ class _DepartmentListPageState extends State<DepartmentListPage> {
     _futureDepartments = DepartmentService.fetchDepartments();
   }
 
+  Future<void> _refreshDepartments() async {
+    setState(() {
+      _futureDepartments = DepartmentService.fetchDepartments();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,6 +34,24 @@ class _DepartmentListPageState extends State<DepartmentListPage> {
         title: const Text('Daftar Department'),
       ),
       drawer: const AppDrawer(),
+
+      // 🔹 FAB untuk tambah department
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          // buka form create (extra = null)
+          final result = await context.push('/department-form');
+
+          // kalau form sukses menyimpan, kita bisa pakai result == true
+          if (result == true) {
+            await _refreshDepartments();
+          } else {
+            // atau langsung refresh tanpa cek result pun boleh:
+            await _refreshDepartments();
+          }
+        },
+        child: const Icon(Icons.add),
+      ),
+
       body: FutureBuilder<List<Department>>(
         future: _futureDepartments,
         builder: (context, snapshot) {
@@ -68,9 +92,10 @@ class _DepartmentListPageState extends State<DepartmentListPage> {
                     child: Text(dept.id.toString()),
                   ),
                   trailing: const Icon(Icons.chevron_right),
+
                   // 👉 Pindah ke halaman detail, bawa object dept
                   onTap: () {
-                    context.go(
+                    context.push(
                       '/department-detail',
                       extra: dept,
                     );

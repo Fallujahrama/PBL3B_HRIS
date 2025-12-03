@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../models/superior.dart';
 
 class SuperiorApi {
-  static const String baseUrl = "http://localhost/api/superior";
+  static const String baseUrl = "http://127.0.0.1:8000/api/superior";
 
   static Future<List<Superior>> getSuperiors() async {
     final response = await http.get(Uri.parse(baseUrl));

@@ -20,12 +20,14 @@ class DepartmentController extends Controller
     // POST /departments
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|max:100',
-            'radius' => 'nullable|max:50',
+        $validated = $request->validate([
+            'name'      => 'required|string|max:100',
+            'radius'    => 'required|string|max:50',   // radius wajib, disimpan meter (varchar)
+            'latitude'  => 'nullable|string|max:50',
+            'longitude' => 'nullable|string|max:50',
         ]);
 
-        $department = Department::create($request->all());
+        $department = Department::create($validated);
 
         return response()->json([
             'success' => true,
@@ -39,7 +41,7 @@ class DepartmentController extends Controller
     {
         $department = Department::find($id);
 
-        if (!$department) {
+        if (! $department) {
             return response()->json([
                 'success' => false,
                 'message' => 'Department not found.',
@@ -57,19 +59,21 @@ class DepartmentController extends Controller
     {
         $department = Department::find($id);
 
-        if (!$department) {
+        if (! $department) {
             return response()->json([
                 'success' => false,
                 'message' => 'Department not found.',
             ], 404);
         }
 
-        $request->validate([
-            'name' => 'sometimes|max:100',
-            'radius' => 'sometimes|max:50',
+        $validated = $request->validate([
+            'name'      => 'sometimes|required|string|max:100',
+            'radius'    => 'sometimes|required|string|max:50',
+            'latitude'  => 'nullable|string|max:50',
+            'longitude' => 'nullable|string|max:50',
         ]);
 
-        $department->update($request->all());
+        $department->update($validated);
 
         return response()->json([
             'success' => true,
@@ -83,7 +87,7 @@ class DepartmentController extends Controller
     {
         $department = Department::find($id);
 
-        if (!$department) {
+        if (! $department) {
             return response()->json([
                 'success' => false,
                 'message' => 'Department not found.',
@@ -97,4 +101,4 @@ class DepartmentController extends Controller
             'message' => 'Department deleted successfully.'
         ]);
     }
-}
+}   
