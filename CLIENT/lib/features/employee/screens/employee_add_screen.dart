@@ -120,10 +120,10 @@ class _EmployeeAddScreenState extends State<EmployeeAddScreen> {
       appBar: AppBar(
         title: const Text(
           'Tambah Karyawan',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.black),
         ),
-        backgroundColor: Colors.blue,
-        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: Form(
         key: _formKey,
@@ -371,7 +371,7 @@ class _EmployeeAddScreenState extends State<EmployeeAddScreen> {
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _saveEmployee,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),

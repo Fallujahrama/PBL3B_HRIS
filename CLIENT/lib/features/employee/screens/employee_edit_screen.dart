@@ -155,10 +155,10 @@ class _EmployeeEditScreenState extends State<EmployeeEditScreen> {
       appBar: AppBar(
         title: const Text(
           'Edit Karyawan',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.black),
         ),
-        backgroundColor: Colors.blue,
-        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: _isLoadingData
           ? const Center(child: CircularProgressIndicator())
@@ -409,7 +409,7 @@ class _EmployeeEditScreenState extends State<EmployeeEditScreen> {
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _updateEmployee,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),

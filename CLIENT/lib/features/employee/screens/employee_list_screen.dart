@@ -47,18 +47,19 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('KARYAWAN', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.blue,
-        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text('Master Karyawan', style: TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.black),
 
       ),
       drawer: const AppDrawer(),
       body: _buildBody(),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/employee/add').then((_) => _loadEmployees()),
-        icon: const Icon(Icons.add),
-        label: const Text('Tambah Karyawan'),
-        backgroundColor: Colors.blue,
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text('Tambah Data', style: TextStyle(color: Colors.white)),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
 

@@ -87,9 +87,9 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Detail Karyawan', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.blue,
-        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text('Detail Karyawan', style: TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: _buildBody(),
     );
@@ -194,7 +194,7 @@ class _EmployeeDetailScreenState extends State<EmployeeDetailScreen> {
                     icon: const Icon(Icons.edit, color: Colors.white),
                     label: const Text('Edit', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w600)),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       elevation: 2,
                     ),
