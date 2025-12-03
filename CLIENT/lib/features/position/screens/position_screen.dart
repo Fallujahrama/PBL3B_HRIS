@@ -13,6 +13,7 @@ class PositionScreen extends StatefulWidget {
 }
 
 class _PositionScreenState extends State<PositionScreen> {
+  // Mengubah futureData menjadi nullable untuk kemudahan handling state di build
   late Future<List<Position>> futureData;
 
   @override
@@ -39,90 +40,91 @@ class _PositionScreenState extends State<PositionScreen> {
     }
   }
 
+  // --- Widget untuk menampilkan Body (Loading/Error/Data) ---
+  Widget _buildBody(BuildContext context) {
+    return FutureBuilder<List<Position>>(
+      future: futureData,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // 1. Loading State (Sama seperti Employee Screen)
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          // 2. Error State (Sama seperti Employee Screen)
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, size: 60, color: Colors.red),
+                const SizedBox(height: 16),
+                Text('Error: ${snapshot.error}', textAlign: TextAlign.center),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: _loadData,
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          );
+        }
+
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          // 3. Empty State (Sama seperti Employee Screen)
+          return const Center(child: Text("Belum ada data posisi."));
+        }
+
+        // 4. Data Loaded State
+        final data = snapshot.data!;
+
+        return RefreshIndicator(
+          onRefresh: () async => _loadData(),
+          child: ListView.builder(
+            // Padding disamakan dengan Employee List Screen (padding: const EdgeInsets.all(16))
+            padding: const EdgeInsets.all(16).copyWith(bottom: 80), // Menambahkan ruang untuk FAB
+            itemCount: data.length,
+            itemBuilder: (context, index) {
+              // Menggunakan PositionTile yang sudah ada
+              return PositionTile(
+                item: data[index],
+                onTap: () => _navigateToForm(data[index]),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(
-        0xFFF5F6F8,
-      ), // Abu-abu sangat muda (clean look)
+          0xFFF5F6F8), // Abu-abu sangat muda (clean look)
       drawer: const AppDrawer(),
       appBar: AppBar(
         title: const Text(
           "Master Posisi",
+          style: TextStyle(color: Colors.black),
         ),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
-        // elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black), // Menambahkan ini agar mirip
       ),
-      body: Column(
-        children: [
-          // Expanded List View
-          Expanded(
-            child: FutureBuilder<List<Position>>(
-              future: futureData,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.hasError) {
-                  return Center(child: Text("Error: ${snapshot.error}"));
-                }
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text("Belum ada data posisi."));
-                }
+      // Mengganti Column + Expanded dengan _buildBody
+      body: _buildBody(context),
 
-                final data = snapshot.data!;
-
-                return RefreshIndicator(
-                  onRefresh: () async => _loadData(),
-                  child: ListView.builder(
-                    padding: const EdgeInsets.only(top: 10, bottom: 100),
-                    itemCount: data.length,
-                    itemBuilder: (context, index) {
-                      return PositionTile(
-                        item: data[index],
-                        onTap: () => _navigateToForm(data[index]),
-                      );
-                    },
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+      // Mengganti bottomNavigationBar dengan FloatingActionButton.extended
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _navigateToForm(),
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text('Tambah Posisi', style: TextStyle(color: Colors.white)),
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
-      // Tombol Floating Action Button yang Lebar (Custom di bawah)
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 10,
-              offset: Offset(0, -5),
-            ),
-          ],
-        ),
-        child: ElevatedButton(
-          onPressed: () => _navigateToForm(),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
-            minimumSize: const Size(double.infinity, 50),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-          child: const Text(
-            "Add Position",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
+      // Menggunakan posisi yang sama
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      
+      // bottomNavigationBar dihapus
     );
   }
 }

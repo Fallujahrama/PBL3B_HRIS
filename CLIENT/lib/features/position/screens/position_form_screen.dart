@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -8,7 +7,7 @@ import '../models/position.dart';
 import '../services/position_api.dart';
 
 class PositionFormScreen extends StatefulWidget {
-  final Position? position; 
+  final Position? position;
 
   const PositionFormScreen({super.key, this.position});
 
@@ -19,14 +18,12 @@ class PositionFormScreen extends StatefulWidget {
 class _PositionFormScreenState extends State<PositionFormScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  
-
   late TextEditingController _nameController;
   late TextEditingController _rateRegulerController;
   late TextEditingController _rateOvertimeController;
 
   bool _isLoading = false;
-  late bool _readOnly; 
+  late bool _readOnly;
 
   double? _rateRegulerValue;
   double? _rateOvertimeValue;
@@ -43,24 +40,19 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
   void initState() {
     super.initState();
 
-    
     _readOnly = widget.position != null;
 
-    
     _rateRegulerValue = widget.position?.rateReguler?.toDouble();
     _rateOvertimeValue = widget.position?.rateOvertime?.toDouble();
 
-    
     _nameController = TextEditingController(text: widget.position?.name ?? '');
     _rateRegulerController = TextEditingController();
     _rateOvertimeController = TextEditingController();
 
-    
     _setControllersInitialText();
   }
 
   void _setControllersInitialText() {
-    
     _rateRegulerController.text = _rateRegulerValue != null
         ? _currencyFormat.format(_rateRegulerValue)
         : '';
@@ -83,8 +75,6 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
   }
 
   Future<void> _submitForm() async {
-    
-    
     if (_readOnly) return;
 
     if (!_formKey.currentState!.validate()) return;
@@ -114,12 +104,11 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
     setState(() => _isLoading = false);
 
     if (success && mounted) {
-      
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Data berhasil disimpan!")));
-      
-      context.pop(true);
+      // Mengirimkan true kembali agar halaman list me-refresh data
+      context.pop(true); 
     } else if (mounted) {
       ScaffoldMessenger.of(
         context,
@@ -158,7 +147,6 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
       if (success && mounted) {
         context.pop(true);
       } else if (mounted) {
-        
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text("Gagal menghapus data.")));
@@ -188,7 +176,8 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+          // Menggunakan style yang lebih tebal untuk label di atas field (seperti form pegawai)
+          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
         ),
         const SizedBox(height: 8),
         TextFormField(
@@ -206,35 +195,30 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
                   return null;
                 },
           decoration: InputDecoration(
-            filled: true,
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            fillColor: _readOnly ? Colors.grey.shade100 : Colors.white,
+            // Menghapus filled: true, karena form pegawai tidak menggunakan filled.
+            // Mengubah border menjadi OutlineInputBorder standar (seperti form pegawai)
+            border: const OutlineInputBorder(),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: Colors.grey.shade400),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide:
+                  BorderSide(color: Theme.of(context).colorScheme.primary),
+            ),
+            // Mengatur padding yang sama dengan form pegawai
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 14,
             ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
+            // Menambahkan prefixIcon agar field terlihat seragam dengan form pegawai
+            prefixIcon: isNumber
+                ? const Icon(Icons.money, size: 20)
+                : const Icon(Icons.badge, size: 20),
+            // Menggunakan warna background jika readOnly
+            fillColor: _readOnly ? Colors.grey.shade100 : Colors.white,
+            filled: _readOnly, // Hanya filled jika readOnly
           ),
         ),
         const SizedBox(height: 16),
@@ -247,8 +231,8 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
     final isEditMode = widget.position != null;
 
     final title = isEditMode
-        ? (_readOnly ? "Position Detail" : "Edit Position")
-        : "Tambah Position";
+        ? (_readOnly ? "Detail Posisi" : "Edit Posisi")
+        : "Tambah Posisi";
     final primaryButtonLabel = isEditMode
         ? (_readOnly ? "Ubah Data" : "Simpan Perubahan")
         : "Simpan";
@@ -256,12 +240,17 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6F8),
       appBar: AppBar(
-        title: Text(title),
+        title: Text(
+          title,
+          style: const TextStyle(color: Colors.black), // Warna teks hitam
+        ),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
-        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black), // Ikon panah kembali
+        elevation: 1, // Memberi sedikit elevasi pada AppBar
         actions: [
           if (isEditMode && !_readOnly)
+            // Tombol batal di AppBar untuk mode edit
             TextButton(
               onPressed: () {
                 _setControllersInitialText();
@@ -271,55 +260,65 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
                   const SnackBar(content: Text("Pengeditan dibatalkan.")),
                 );
               },
-              child: const Text("Batal", style: TextStyle(color: Colors.white)),
+              child: Text(
+                "Batal",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary, // Menggunakan warna primary
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        // Padding disamakan dengan form pegawai
+        padding: const EdgeInsets.all(16), 
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              if (isEditMode) ...[
-                const SizedBox(height: 10),
-                CircleAvatar(
-                  radius: 40,
-                  backgroundImage: NetworkImage(
-                    'https://ui-avatars.com/api/?name=${Uri.encodeComponent(widget.position!.name ?? "Posisi")}&background=0D8ABC&color=fff',
+              // CARD: INFORMASI POSISI (Seperti Card di Form Pegawai)
+              Card(
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header Card
+                      // const Text(
+                      //   'Informasi Posisi',
+                      //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      // ),
+                      const SizedBox(height: 16),
+                      
+                      // Bidang Input
+                      _buildTextField(
+                        label: "Nama Posisi",
+                        controller: _nameController,
+                        focusNode: _firstFocus,
+                      ),
+                      _buildTextField(
+                        label: "Rate Reguler",
+                        controller: _rateRegulerController,
+                        isNumber: true,
+                      ),
+                      _buildTextField(
+                        label: "Rate Overtime",
+                        controller: _rateOvertimeController,
+                        isNumber: true,
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  widget.position!.name ?? "-",
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 20),
-              ],
-
-              
-              
-              _buildTextField(
-                label: "Nama Posisi",
-                controller: _nameController,
-                focusNode: _firstFocus, 
-              ),
-              _buildTextField(
-                label: "Rate Reguler",
-                controller: _rateRegulerController,
-                isNumber: true,
-              ),
-              _buildTextField(
-                label: "Rate Overtime",
-                controller: _rateOvertimeController,
-                isNumber: true,
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
 
+              // Tombol Utama (Ubah Data / Simpan Perubahan / Simpan)
               SizedBox(
                 width: double.infinity,
                 height: 50,
@@ -327,8 +326,6 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
                   onPressed: _isLoading
                       ? null
                       : () {
-                          
-                          
                           if (isEditMode && _readOnly) {
                             setState(() => _readOnly = false);
                             Future.delayed(
@@ -344,11 +341,9 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
                             );
                             return;
                           }
-                          
                           _submitForm();
                         },
                   style: ElevatedButton.styleFrom(
-                    
                     backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(
@@ -368,32 +363,32 @@ class _PositionFormScreenState extends State<PositionFormScreen> {
                 ),
               ),
 
+              // Tombol Hapus (Hanya di mode edit)
               if (isEditMode) ...[
                 const SizedBox(height: 12),
                 SizedBox(
                   width: double.infinity,
                   height: 50,
-                  child: TextButton(
+                  child: ElevatedButton( // Mengubah TextButton menjadi ElevatedButton agar style-nya lebih konsisten dengan Save/Edit Button
                     onPressed: _isLoading || !_readOnly
                         ? null
                         : _deletePosition,
-                    style: TextButton.styleFrom(
-                      
+                    style: ElevatedButton.styleFrom(
+                      // Menggunakan warna error sebagai background (merah)
                       backgroundColor: Theme.of(context).colorScheme.error,
                       foregroundColor: Theme.of(
                         context,
-                      ).colorScheme.onError, 
+                      ).colorScheme.onError,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                     child: const Text(
-                      "Delete",
+                      "Hapus", // Menggunakan "Hapus" (Indonesia)
                       style: TextStyle(
                         fontSize: 16,
-                        
-                        
                         fontWeight: FontWeight.bold,
+                        color: Colors.white, // Teks putih di atas background merah
                       ),
                     ),
                   ),

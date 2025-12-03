@@ -32,7 +32,7 @@ class AppDrawer extends StatelessWidget {
           // ==== POSITION (MASTER POSITION) ====
           ListTile(
             leading: const Icon(Icons.work),
-            title: const Text("Positions"),
+            title: const Text("Posisi"),
             onTap: () => context.go('/positions'),
           ),
           
