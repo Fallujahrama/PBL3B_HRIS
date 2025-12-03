@@ -45,7 +45,7 @@ class TotalSalaryCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Total Salary", 
+                    "Total Gaji", 
                     style: TextStyle(fontSize: 14, color: textColor.withOpacity(0.7)) // Teks putih buram
                   ),
                   const SizedBox(height: 8),

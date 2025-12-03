@@ -52,7 +52,7 @@ class AppDrawer extends StatelessWidget {
           
              ListTile(
             leading: const Icon(Icons.article),
-            title: const Text("Laporan Gaji Pegawai"),
+            title: const Text("Laporan Gaji Karyawan"),
             onTap: () => context.go('/summary-salary'),
           ),
         ],
