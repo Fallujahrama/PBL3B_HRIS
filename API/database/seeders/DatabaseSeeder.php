@@ -25,5 +25,6 @@ class DatabaseSeeder extends Seeder
         //$this->call(LetterFormatsSeeder::class);
         //$this->call(LettersSeeder::class);
         $this->call(PositionSeeder::class);
+        $this->call(SalaryReportSeeder::class);
     }
 }
