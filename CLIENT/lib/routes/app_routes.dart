@@ -14,12 +14,14 @@ import '../features/department/screens/department_list_page.dart';
 import '../features/department/screens/department_detail_page.dart';
 import '../features/department/screens/department_form_page.dart';
 import '../features/department/models/department.dart';
+import '../features/department/screens/department_map_page.dart';
 
 class AppRoutes {
   // 🔹 tambahkan konstanta nama route
   static const String departmentList = 'departmentList';
   static const String departmentDetail = 'departmentDetail';
   static const String departmentForm = 'departmentForm';
+  static const String departmentMap = 'departmentMap';
 
   static final router = GoRouter(
     initialLocation: '/',
@@ -74,6 +76,11 @@ class AppRoutes {
           final dept = state.extra as Department?;
           return DepartmentFormPage(department: dept);
         },
+      ),
+      GoRoute(
+        path: '/department-map',
+        name: departmentMap,
+        builder: (context, state) => const DepartmentMapPage(),
       ),
       
       // Employee Routes
