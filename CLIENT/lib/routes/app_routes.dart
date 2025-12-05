@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
-import 'package:tracer_study_test_api/features/summary_salary/screens/summary_salary_screen.dart';
+import 'package:hris_3B/features/summary_salary/screens/summary_salary_screen.dart';
+// import 'package:tracer_study_test_api/features/summary_salary/screens/summary_salary_screen.dart';
 import '../features/splash/screens/splash_screen.dart';
 import '../features/home/screens/home_screen.dart';
 import '../features/superior/screens/superior_screen.dart';
