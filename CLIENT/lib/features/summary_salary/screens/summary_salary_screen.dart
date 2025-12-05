@@ -76,7 +76,7 @@ class _SummarySalaryScreenState extends State<SummarySalaryScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-        title: const Text("Salary Report"),
+        title: const Text("Laporan Gaji Karyawan"),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
@@ -133,7 +133,7 @@ class _SummarySalaryScreenState extends State<SummarySalaryScreen> {
                         child: Column(
                           children: [
                             SummaryKpiCard(
-                              title: "Total Regular Hours",
+                              title: "Total Jam Regular",
                               value:
                                   "${summary.totalHours.toStringAsFixed(0)} Jam",
                               icon: Icons.timer_outlined,
@@ -141,7 +141,7 @@ class _SummarySalaryScreenState extends State<SummarySalaryScreen> {
                             ),
                             const SizedBox(height: 16),
                             SummaryKpiCard(
-                              title: "Total Overtime Hours",
+                              title: "Total Jam Lembur",
                               value:
                                   "${summary.totalOvertime.toStringAsFixed(0)} Jam",
                               icon: Icons.access_time_filled,
@@ -158,7 +158,7 @@ class _SummarySalaryScreenState extends State<SummarySalaryScreen> {
 
                 // SALARY CHART
                 _buildChartSection(
-                  title: "Salary by Department",
+                  title: "Gaji per Departemen",
                   data: report.salaryByDepartment,
                   type: 'salary',
                 ),
@@ -167,7 +167,7 @@ class _SummarySalaryScreenState extends State<SummarySalaryScreen> {
 
                 // OVERTIME CHART
                 _buildChartSection(
-                  title: "Overtime Hours by Department",
+                  title: "Jam Lembur per Departemen",
                   data: report.overtimeByDepartment,
                   type: 'overtime',
                 ),

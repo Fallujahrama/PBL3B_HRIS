@@ -29,7 +29,7 @@ class AppDrawer extends StatelessWidget {
           // ==== POSITION (MASTER POSITION) ====
           ListTile(
             leading: const Icon(Icons.work),
-            title: const Text("Positions"),
+            title: const Text("Posisi"),
             onTap: () => context.go('/positions'),
           ),
 
@@ -57,7 +57,7 @@ class AppDrawer extends StatelessWidget {
           // ==== LAPORAN GAJI ====
           ListTile(
             leading: const Icon(Icons.article),
-            title: const Text("Laporan Gaji Pegawai"),
+            title: const Text("Laporan Gaji Karyawan"),
             onTap: () => context.go('/summary-salary'),
           ),
         ],

@@ -89,7 +89,7 @@ class SalaryReportController extends Controller
             'data' => $data,
         ], 200);
     }
-    
+
     // --- Helper / Protected methods (Logika utama tidak berubah, hanya penamaan rate) ---
 
     protected function resolveFilters(Request $request): array
@@ -148,7 +148,6 @@ class SalaryReportController extends Controller
             $regularHours = $this->calcRegularHours($c);
             $overtimeHours = $this->calcOvertimeHours($c);
 
-            // FIX: Menggunakan rate_regular (asumsi ini nama kolom yang benar)
             $rateRegular = optional($c->employee->position)->rate_regular ?? 0;
             $rateOvertime = optional($c->employee->position)->rate_overtime ?? 0;
 
