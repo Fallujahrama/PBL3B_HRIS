@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../models/department.dart';
-import '../services/department_service.dart';   // ⬅ penting untuk delete
-import '../../../routes/app_routes.dart';      // ⬅ untuk pushNamed
+import '../services/department_service.dart';
+import '../../../routes/app_routes.dart';
 import '../../../widgets/app_drawer.dart';
 
 class DepartmentDetailPage extends StatelessWidget {
@@ -14,7 +14,6 @@ class DepartmentDetailPage extends StatelessWidget {
     required this.department,
   });
 
-  // ⬇ fungsi konfirmasi + delete
   Future<void> _confirmDelete(BuildContext context) async {
     final parentContext = context;
 
@@ -29,13 +28,13 @@ class DepartmentDetailPage extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(dialogCtx).pop(false); // Batal
+                Navigator.of(dialogCtx).pop(false);
               },
               child: const Text('Batal'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(dialogCtx).pop(true); // Konfirmasi
+                Navigator.of(dialogCtx).pop(true);
               },
               child: const Text(
                 'Hapus',
@@ -49,15 +48,12 @@ class DepartmentDetailPage extends StatelessWidget {
 
     if (confirmed == true) {
       try {
-        // Panggil API delete
         await DepartmentService.deleteDepartment(department.id);
 
-        // Beri info ke user
         ScaffoldMessenger.of(parentContext).showSnackBar(
           const SnackBar(content: Text('Department berhasil dihapus')),
         );
 
-        // Kembali ke halaman sebelumnya, kirim result = true
         parentContext.pop(true);
       } catch (e) {
         ScaffoldMessenger.of(parentContext).showSnackBar(
@@ -67,13 +63,49 @@ class DepartmentDetailPage extends StatelessWidget {
     }
   }
 
+  Widget _infoTile({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          )
+        ],
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 28, color: Colors.deepPurple),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 15, color: Colors.black87),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(department.name),
         actions: [
-          // EDIT
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () async {
@@ -91,39 +123,84 @@ class DepartmentDetailPage extends StatelessWidget {
               }
             },
           ),
-          // DELETE
           IconButton(
             icon: const Icon(Icons.delete),
-            onPressed: () {
-              _confirmDelete(context);
-            },
+            onPressed: () => _confirmDelete(context),
           ),
         ],
       ),
       drawer: const AppDrawer(),
+      backgroundColor: const Color(0xFFF5F6FA),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  department.name,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+        padding: const EdgeInsets.all(18.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header Card
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(22),
+              decoration: BoxDecoration(
+                color: Colors.deepPurple,
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.deepPurple.withOpacity(0.3),
+                    blurRadius: 14,
+                    offset: const Offset(0, 6),
                   ),
-                ),
-                const SizedBox(height: 12),
-                Text('Radius: ${department.radius} meter'),
-                const SizedBox(height: 8),
-                Text('Latitude : ${department.latitude ?? '-'}'),
-                Text('Longitude: ${department.longitude ?? '-'}'),
-              ],
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    department.name,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    "Detail Lokasi Department",
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
+
+            const SizedBox(height: 22),
+
+            // Radius
+            _infoTile(
+              icon: Icons.radar,
+              label: "Radius",
+              value: "${department.radius} meter",
+            ),
+
+            const SizedBox(height: 16),
+
+            // Latitude
+            _infoTile(
+              icon: Icons.location_on,
+              label: "Latitude",
+              value: department.latitude?.toString() ?? "-",
+            ),
+
+            const SizedBox(height: 16),
+
+            // Longitude
+            _infoTile(
+              icon: Icons.location_on_outlined,
+              label: "Longitude",
+              value: department.longitude?.toString() ?? "-",
+            ),
+          ],
         ),
       ),
     );
