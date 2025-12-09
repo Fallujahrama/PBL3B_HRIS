@@ -10,10 +10,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
-// Import Request Validation yang seharusnya sudah Anda buat
-// use App\Http\Requests\StoreEmployeeRequest;
-// use App\Http\Requests\UpdateEmployeeRequest;
-
 class EmployeeController extends Controller
 {
     /**
@@ -42,7 +38,7 @@ class EmployeeController extends Controller
     }
 
         /**
-     * Tambah karyawan baru + buat user terlebih dahulu.
+     * Tambah user baru + buat karyawan terlebih dahulu.
      */
     public function store(Request $request)
     {
@@ -73,14 +69,14 @@ class EmployeeController extends Controller
         DB::beginTransaction();
 
         try {
-            // 1️⃣ Buat User terlebih dahulu
+            // Buat User terlebih dahulu
             $user = \App\Models\User::create([
                 'email'     => $request->email,
                 'password'  => bcrypt($request->password),
                 'is_admin'  => $request->is_admin ?? false
             ]);
 
-            // 2️⃣ Buat Employee memakai user_id
+            // Buat Employee memakai user_id
             $employee = Employee::create([
                 'user_id'       => $user->id,
                 'first_name'    => $request->first_name,
@@ -162,7 +158,6 @@ class EmployeeController extends Controller
             ], Response::HTTP_NOT_FOUND);
         }
     
-        // Validasi UPDATE (disesuaikan dengan database kamu)
         $validator = Validator::make($request->all(), [
     
             // USER

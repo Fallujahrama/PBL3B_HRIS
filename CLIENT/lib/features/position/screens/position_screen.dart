@@ -13,13 +13,35 @@ class PositionScreen extends StatefulWidget {
 }
 
 class _PositionScreenState extends State<PositionScreen> {
-  // Mengubah futureData menjadi nullable untuk kemudahan handling state di build
   late Future<List<Position>> futureData;
+
+  final ScrollController _scrollController = ScrollController();
+  bool _isFabVisible = true;
 
   @override
   void initState() {
     super.initState();
     _loadData();
+    _scrollController.addListener(_scrollListener);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    if (_scrollController.offset > 0 && _isFabVisible) {
+      setState(() {
+        _isFabVisible = false;
+      });
+    } else if (_scrollController.offset <= 0 && !_isFabVisible) {
+      setState(() {
+        _isFabVisible = true;
+      });
+    }
   }
 
   void _loadData() {
@@ -28,30 +50,23 @@ class _PositionScreenState extends State<PositionScreen> {
     });
   }
 
-  // Navigasi ke Form (untuk Tambah atau Edit)
   void _navigateToForm([Position? position]) async {
-    // Kita push ke route form (kita akan buat route-nya nanti)
-    // Menggunakan extra untuk passing object position
     final result = await context.push('/positions/form', extra: position);
 
-    // Jika kembali dengan nilai true (berhasil simpan/hapus), refresh data
     if (result == true) {
       _loadData();
     }
   }
 
-  // --- Widget untuk menampilkan Body (Loading/Error/Data) ---
   Widget _buildBody(BuildContext context) {
     return FutureBuilder<List<Position>>(
       future: futureData,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          // 1. Loading State (Sama seperti Employee Screen)
           return const Center(child: CircularProgressIndicator());
         }
 
         if (snapshot.hasError) {
-          // 2. Error State (Sama seperti Employee Screen)
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -70,21 +85,18 @@ class _PositionScreenState extends State<PositionScreen> {
         }
 
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          // 3. Empty State (Sama seperti Employee Screen)
           return const Center(child: Text("Belum ada data posisi."));
         }
 
-        // 4. Data Loaded State
         final data = snapshot.data!;
 
         return RefreshIndicator(
           onRefresh: () async => _loadData(),
           child: ListView.builder(
-            // Padding disamakan dengan Employee List Screen (padding: const EdgeInsets.all(16))
-            padding: const EdgeInsets.all(16).copyWith(bottom: 80), // Menambahkan ruang untuk FAB
+            controller: _scrollController,
+            padding: const EdgeInsets.all(16).copyWith(bottom: 80), 
             itemCount: data.length,
             itemBuilder: (context, index) {
-              // Menggunakan PositionTile yang sudah ada
               return PositionTile(
                 item: data[index],
                 onTap: () => _navigateToForm(data[index]),
@@ -100,7 +112,7 @@ class _PositionScreenState extends State<PositionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(
-          0xFFF5F6F8), // Abu-abu sangat muda (clean look)
+          0xFFF5F6F8), 
       drawer: const AppDrawer(),
       appBar: AppBar(
         title: const Text(
@@ -109,22 +121,20 @@ class _PositionScreenState extends State<PositionScreen> {
         ),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
-        iconTheme: const IconThemeData(color: Colors.black), // Menambahkan ini agar mirip
+        iconTheme: const IconThemeData(color: Colors.black), 
       ),
-      // Mengganti Column + Expanded dengan _buildBody
       body: _buildBody(context),
 
-      // Mengganti bottomNavigationBar dengan FloatingActionButton.extended
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _navigateToForm(),
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text('Tambah Posisi', style: TextStyle(color: Colors.white)),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+      floatingActionButton: AnimatedOpacity(
+        opacity: _isFabVisible ? 1.0 : 0.0,
+        duration: const Duration(milliseconds: 300),
+        child: FloatingActionButton(
+          onPressed: () => _navigateToForm(),
+          child: const Icon(Icons.add, color: Colors.white), 
+          backgroundColor: Theme.of(context).colorScheme.primary,
+        ),
       ),
-      // Menggunakan posisi yang sama
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       
-      // bottomNavigationBar dihapus
     );
   }
 }
