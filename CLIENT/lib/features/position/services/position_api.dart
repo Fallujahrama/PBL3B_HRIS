@@ -12,7 +12,7 @@ class PositionApi {
       return "http://127.0.0.1:8000/api/positions"; // URL untuk Browser
     } else {
       // Ganti 10.0.2.2 jika di Android Emulator, atau IP Laptop jika di HP Fisik
-      return "http://10.0.2.2:8000/api/positions"; 
+      return "http://10.10.4.93:8000/api/positions"; 
     }
   }
 
