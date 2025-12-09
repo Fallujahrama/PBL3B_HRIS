@@ -25,7 +25,6 @@ class SummarySalaryApi {
     }
   }
   
-  // NEW FUNCTION: Mengambil data gaji historis bulanan untuk sparkline
   static Future<List<MonthlySalaryHistory>> getMonthlyHistory() async {
     final uri = Uri.parse('$_baseUrl/summary-salary/monthly-history');
     try {
@@ -78,7 +77,6 @@ class SummarySalaryApi {
     }
   }
 
-  // FIX: Memasukkan getMonthlyHistory ke dalam Future.wait
   static Future<SalaryReportCombined> fetchCombinedData({
     int? month, 
     int? year, 
@@ -86,14 +84,14 @@ class SummarySalaryApi {
   }) async {
     final reportFuture = getFullReport(month: month, year: year, department: department);
     final departmentFuture = getDepartments();
-    final historyFuture = getMonthlyHistory(); // <-- Panggil history
+    final historyFuture = getMonthlyHistory();
 
     final results = await Future.wait([reportFuture, departmentFuture, historyFuture]);
     
     return SalaryReportCombined(
       report: results[0] as SalaryReportData,
       departments: results[1] as List<Department>,
-      history: results[2] as List<MonthlySalaryHistory>, // <-- Ambil history
+      history: results[2] as List<MonthlySalaryHistory>, 
     );
   }
 }

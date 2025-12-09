@@ -4,7 +4,7 @@ class SummaryKpiCard extends StatelessWidget {
   final String title;
   final String value;
   final IconData icon;
-  final Color color; // Color ini akan digunakan untuk aksen (jika perlu)
+  final Color color; 
 
   const SummaryKpiCard({
     super.key,
@@ -20,7 +20,7 @@ class SummaryKpiCard extends StatelessWidget {
     const textColor = Colors.white;
 
     return SizedBox(
-      width: double.infinity, // Memaksa lebar 100% dari parent yang tersedia
+      width: double.infinity, 
       child: Card(
         elevation: 4,
         color: primaryColor,
@@ -35,11 +35,10 @@ class SummaryKpiCard extends StatelessWidget {
                 child: Icon(
                   icon,
                   size: 70,
-                  color: textColor.withOpacity(0.15), // Opacity rendah
+                  color: textColor.withOpacity(0.15),
                 ),
               ),
 
-              // 2. Konten Teks
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -47,7 +46,7 @@ class SummaryKpiCard extends StatelessWidget {
                     title,
                     style: const TextStyle(
                       fontSize: 16,
-                      color: textColor, // Teks putih
+                      color: textColor,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -56,10 +55,9 @@ class SummaryKpiCard extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: textColor, // Teks putih
+                      color: textColor,
                     ),
                   ),
-                  // Ruang kosong untuk menjaga layout tetap konsisten
                   const SizedBox(height: 8),
                 ],
               ),

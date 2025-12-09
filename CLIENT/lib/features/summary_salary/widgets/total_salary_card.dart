@@ -23,49 +23,49 @@ class TotalSalaryCard extends StatelessWidget {
       width: double.infinity, 
       child: Card(
         elevation: 6,
-        color: primaryColor, // FIX: Mengubah warna Card menjadi primary blue
+        color: primaryColor, 
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Stack(
             children: [
-              // 1. IKON BESAR DI LATAR BELAKANG (Sudut Kanan Bawah)
+              
               Positioned(
                 bottom: -10,
                 right: -10,
                 child: Icon(
                   backgroundIcon,
                   size: 120,
-                  color: textColor.withOpacity(0.1), // FIX: Opacity rendah
+                  color: textColor.withOpacity(0.1), 
                 ),
               ),
 
-              // 2. KONTEN UTAMA
+              
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     "Total Gaji", 
-                    style: TextStyle(fontSize: 14, color: textColor.withOpacity(0.7)) // Teks putih buram
+                    style: TextStyle(fontSize: 14, color: textColor.withOpacity(0.7)) 
                   ),
                   const SizedBox(height: 8),
                   
-                  // NILAI TOTAL GAJI UTAMA
+                  
                   Text(
                     formatRupiah(summary.totalSalary),
                     style: const TextStyle(
                       fontSize: 32, 
                       fontWeight: FontWeight.bold,
-                      color: textColor, // FIX: Teks putih
+                      color: textColor, 
                     ),
                   ),
                   const SizedBox(height: 16), 
 
-                  // BARIS BAWAH: PERSENTASE PERUBAHAN & EMPLOYEE COUNT
+                  
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Employee Count
+                      
                       Row(
                         children: [
                           const Icon(Icons.people_alt, size: 18, color: Colors.white70),
