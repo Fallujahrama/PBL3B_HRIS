@@ -28,14 +28,10 @@ class _DepartmentFormPageState extends State<DepartmentFormPage> {
   @override
   void initState() {
     super.initState();
-    _nameController =
-        TextEditingController(text: widget.department?.name ?? '');
-    _radiusController =
-        TextEditingController(text: widget.department?.radius ?? '');
-    _latitudeController =
-        TextEditingController(text: widget.department?.latitude ?? '');
-    _longitudeController =
-        TextEditingController(text: widget.department?.longitude ?? '');
+    _nameController = TextEditingController(text: widget.department?.name ?? '');
+    _radiusController = TextEditingController(text: widget.department?.radius ?? '');
+    _latitudeController = TextEditingController(text: widget.department?.latitude ?? '');
+    _longitudeController = TextEditingController(text: widget.department?.longitude ?? '');
   }
 
   @override
@@ -54,29 +50,19 @@ class _DepartmentFormPageState extends State<DepartmentFormPage> {
 
     try {
       if (isEdit) {
-        // UPDATE
         await DepartmentService.updateDepartment(
           id: widget.department!.id,
           name: _nameController.text.trim(),
           radius: _radiusController.text.trim(),
-          latitude: _latitudeController.text.trim().isEmpty
-              ? null
-              : _latitudeController.text.trim(),
-          longitude: _longitudeController.text.trim().isEmpty
-              ? null
-              : _longitudeController.text.trim(),
+          latitude: _latitudeController.text.trim().isEmpty ? null : _latitudeController.text.trim(),
+          longitude: _longitudeController.text.trim().isEmpty ? null : _longitudeController.text.trim(),
         );
       } else {
-        // CREATE
         await DepartmentService.createDepartment(
           name: _nameController.text.trim(),
           radius: _radiusController.text.trim(),
-          latitude: _latitudeController.text.trim().isEmpty
-              ? null
-              : _latitudeController.text.trim(),
-          longitude: _longitudeController.text.trim().isEmpty
-              ? null
-              : _longitudeController.text.trim(),
+          latitude: _latitudeController.text.trim().isEmpty ? null : _latitudeController.text.trim(),
+          longitude: _longitudeController.text.trim().isEmpty ? null : _longitudeController.text.trim(),
         );
       }
 
@@ -84,23 +70,16 @@ class _DepartmentFormPageState extends State<DepartmentFormPage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(isEdit
-              ? 'Department berhasil diupdate'
-              : 'Department berhasil dibuat'),
+          content: Text(isEdit ? 'Department berhasil diupdate' : 'Department berhasil dibuat'),
         ),
       );
 
-      // Kembali ke halaman sebelumnya (list/detail)
-      Navigator.of(context).pop(true); // bisa dipakai untuk refresh
+      Navigator.of(context).pop(true);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
-      if (mounted) {
-        setState(() => _isSaving = false);
-      }
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
@@ -108,79 +87,126 @@ class _DepartmentFormPageState extends State<DepartmentFormPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEdit ? 'Edit Department' : 'Tambah Department'),
+        leading: IconButton(
+    icon: const Icon(Icons.arrow_back),
+    onPressed: () => Navigator.pop(context),
+  ),
+        title: Text(
+          isEdit ? 'Edit Department' : 'Tambah Department',
+          style: const TextStyle(color: Colors.black),
+        ),
+        backgroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
+
       drawer: const AppDrawer(),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: ListView(
-                children: [
-                  TextFormField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Nama Department',
+
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Card(
+            elevation: 3,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // const Text(
+                    //   'Informasi Department',
+                    //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    // ),
+                    // const SizedBox(height: 16),
+
+                    // Name
+                    const Text('Nama Department', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _nameController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.business),
+                        hintText: 'Masukkan nama department',
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) return 'Nama wajib diisi';
+                        return null;
+                      },
                     ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Nama wajib diisi';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _radiusController,
-                    decoration: const InputDecoration(
-                      labelText: 'Radius (meter)',
+                    const SizedBox(height: 16),
+
+                    // Radius
+                    const Text('Radius (meter)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _radiusController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.radar),
+                        hintText: 'Masukkan radius',
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) return 'Radius wajib diisi';
+                        return null;
+                      },
                     ),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Radius wajib diisi';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _latitudeController,
-                    decoration: const InputDecoration(
-                      labelText: 'Latitude (opsional)',
+                    const SizedBox(height: 16),
+
+                    // Latitude
+                    const Text('Latitude (opsional)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _latitudeController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.location_on),
+                        hintText: 'Masukkan latitude',
+                      ),
                     ),
-                    keyboardType: TextInputType.number,
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _longitudeController,
-                    decoration: const InputDecoration(
-                      labelText: 'Longitude (opsional)',
+                    const SizedBox(height: 16),
+
+                    // Longitude
+                    const Text('Longitude (opsional)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _longitudeController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.location_on_outlined),
+                        hintText: 'Masukkan longitude',
+                      ),
                     ),
-                    keyboardType: TextInputType.number,
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _isSaving ? null : _save,
-                      child: _isSaving
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : Text(isEdit ? 'Simpan Perubahan' : 'Simpan'),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-        ),
+
+          const SizedBox(height: 24),
+
+          // SAVE BUTTON
+          SizedBox(
+            height: 50,
+            child: ElevatedButton(
+              onPressed: _isSaving ? null : _save,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              child: _isSaving
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : Text(
+                      isEdit ? 'Simpan' : 'Simpan',
+                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+            ),
+          ),
+        ],
       ),
     );
   }

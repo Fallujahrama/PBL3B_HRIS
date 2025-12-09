@@ -15,10 +15,8 @@ class DepartmentDetailPage extends StatelessWidget {
   });
 
   Future<void> _confirmDelete(BuildContext context) async {
-    final parentContext = context;
-
     final bool? confirmed = await showDialog<bool>(
-      context: parentContext,
+      context: context,
       builder: (dialogCtx) {
         return AlertDialog(
           title: const Text('Hapus Department'),
@@ -27,15 +25,11 @@ class DepartmentDetailPage extends StatelessWidget {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(dialogCtx).pop(false);
-              },
+              onPressed: () => Navigator.pop(dialogCtx, false),
               child: const Text('Batal'),
             ),
             TextButton(
-              onPressed: () {
-                Navigator.of(dialogCtx).pop(true);
-              },
+              onPressed: () => Navigator.pop(dialogCtx, true),
               child: const Text(
                 'Hapus',
                 style: TextStyle(color: Colors.red),
@@ -50,13 +44,13 @@ class DepartmentDetailPage extends StatelessWidget {
       try {
         await DepartmentService.deleteDepartment(department.id);
 
-        ScaffoldMessenger.of(parentContext).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Department berhasil dihapus')),
         );
 
-        parentContext.pop(true);
+        context.pop(true);
       } catch (e) {
-        ScaffoldMessenger.of(parentContext).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Gagal menghapus: $e')),
         );
       }
@@ -83,12 +77,15 @@ class DepartmentDetailPage extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, size: 28, color: Colors.deepPurple),
+          Icon(icon, size: 28, color: Colors.blueGrey),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
           Text(
@@ -103,49 +100,41 @@ class DepartmentDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(department.name),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () async {
-              final result = await context.pushNamed(
-                AppRoutes.departmentForm,
-                extra: department,
-              );
-
-              if (result == true) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Department berhasil diperbarui'),
-                  ),
-                );
-              }
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () => _confirmDelete(context),
-          ),
-        ],
-      ),
       drawer: const AppDrawer(),
       backgroundColor: const Color(0xFFF5F6FA),
-      body: Padding(
+
+      // ----------------------------------------
+      // APP BAR: tombol BACK saja
+      // ----------------------------------------
+      appBar: AppBar(
+        leading: IconButton(
+    icon: const Icon(Icons.arrow_back),
+    onPressed: () => Navigator.pop(context),
+  ),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0.5,
+        title: Text(
+          department.name,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+      ),
+
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(18.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Card
+            // ---------------- HEADER CARD ----------------
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(22),
               decoration: BoxDecoration(
-                color: Colors.deepPurple,
+                color: Theme.of(context).colorScheme.primary,
                 borderRadius: BorderRadius.circular(18),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.deepPurple.withOpacity(0.3),
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.28),
                     blurRadius: 14,
                     offset: const Offset(0, 6),
                   ),
@@ -174,9 +163,9 @@ class DepartmentDetailPage extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 22),
+            const SizedBox(height: 26),
 
-            // Radius
+            // ---------------- INFORMATION TILES ----------------
             _infoTile(
               icon: Icons.radar,
               label: "Radius",
@@ -185,7 +174,6 @@ class DepartmentDetailPage extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            // Latitude
             _infoTile(
               icon: Icons.location_on,
               label: "Latitude",
@@ -194,12 +182,67 @@ class DepartmentDetailPage extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            // Longitude
             _infoTile(
               icon: Icons.location_on_outlined,
               label: "Longitude",
               value: department.longitude?.toString() ?? "-",
             ),
+
+            const SizedBox(height: 40),
+
+            // ---------------- BOTTOM BUTTON AREA ----------------
+            Row(
+              children: [
+                // EDIT BUTTON
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () async {
+                      final result = await context.pushNamed(
+                        AppRoutes.departmentForm,
+                        extra: department,
+                      );
+
+                      if (result == true) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Department berhasil diperbarui'),
+                          ),
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.edit, size: 18, color: Colors.white),
+                    label: const Text("Edit", style: TextStyle(color: Colors.white)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF375A8C),
+                      padding: const EdgeInsets.symmetric(vertical: 28),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(width: 16),
+
+                // DELETE BUTTON
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _confirmDelete(context),
+                    icon: const Icon(Icons.delete, size: 18, color: Colors.white),
+                    label: const Text("Hapus", style: TextStyle(color: Colors.white)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      padding: const EdgeInsets.symmetric(vertical: 28),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 20),
           ],
         ),
       ),
