@@ -1,10 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/employee_model.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class EmployeeApiService {
   // Ganti dengan URL API Laravel Anda
-  static const String baseUrl = 'http://127.0.0.1:8000/api';
+
+  static final String baseUrl = dotenv.env['BASE_URL'] ?? 'http://127.0.0.1:8000/api';
+
+  
   
   // Get all employees
   Future<List<Employee>> getAllEmployees() async {

@@ -3,7 +3,6 @@ import 'package:hris_3B/features/summary_salary/screens/summary_salary_screen.da
 // import 'package:tracer_study_test_api/features/summary_salary/screens/summary_salary_screen.dart';
 import '../features/splash/screens/splash_screen.dart';
 import '../features/home/screens/home_screen.dart';
-import '../features/superior/screens/superior_screen.dart';
 import '../features/employee/screens/employee_list_screen.dart';
 import '../features/employee/screens/employee_add_screen.dart';
 import '../features/employee/screens/employee_detail_screen.dart';

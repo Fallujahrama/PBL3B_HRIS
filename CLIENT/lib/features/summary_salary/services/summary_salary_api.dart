@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/summary_salary.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 
 class SummarySalaryApi {
-  static const String _baseUrl = 'http://192.168.72.101:8000/api'; 
-  // static const String _baseUrl = 'http://192.168.66.114:8000/api'; 
+  static final String _baseUrl = dotenv.env['BASE_URL'] ?? 'http://127.0.0.1:8000/api';
 
   static Future<List<Department>> getDepartments() async {
     final uri = Uri.parse('$_baseUrl/summary-salary/departments');

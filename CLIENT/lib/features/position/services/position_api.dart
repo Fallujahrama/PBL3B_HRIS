@@ -1,20 +1,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/position.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:flutter/foundation.dart'; // Import ini untuk kishweb check
 
 class PositionApi {
-  // LOGIC URL OTOMATIS:
-  // Jika di Web/iOS/Desktop -> localhost
-  // Jika di Android Emulator -> 10.0.2.2
-  static String get baseUrl {
-    if (kIsWeb) {
-      return "http://127.0.0.1:8000/api/positions"; // URL untuk Browser
-    } else {
-      // Ganti 10.0.2.2 jika di Android Emulator, atau IP Laptop jika di HP Fisik
-      return "http://10.10.4.93:8000/api/positions"; 
-    }
-  }
+
+  static final String baseUrl_ = dotenv.env['BASE_URL'] ?? 'http://127.0.0.1:8000/api';
+
+  static String get baseUrl => '$baseUrl_/positions';
 
   // --- READ (GET) ---
   static Future<List<Position>> getPositions() async {

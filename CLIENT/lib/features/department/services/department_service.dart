@@ -2,13 +2,12 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../models/department.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class DepartmentService {
-  // GANTI kalau kamu pakai emulator Android / device lain:
-  // - Web / Windows:  http://127.0.0.1:8000/api
-  // - Android emulator: http://10.0.2.2:8000/api
-  //static const String baseUrl = 'http://127.0.0.1:8000/api'; KALAU PAKE CHROME
-  static const String baseUrl = 'http://10.0.2.2:8000/api'; // KALAU PAKE EMULATOR ANDROID
+
+    static final String baseUrl = dotenv.env['BASE_URL'] ?? 'http://127.0.0.1:8000/api';
+
 
   /// GET /api/departments
   static Future<List<Department>> fetchDepartments() async {
