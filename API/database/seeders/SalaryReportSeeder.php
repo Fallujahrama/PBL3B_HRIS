@@ -25,8 +25,8 @@ class SalaryReportSeeder extends Seeder
         DB::table('positions')->truncate();
         DB::table('employees')->truncate();
         DB::table('check_clocks')->truncate();
-        DB::table('letter_formats')->truncate();
-        DB::table('letters')->truncate();
+        // DB::table('letter_formats')->truncate();
+        // DB::table('letters')->truncate();
 
         // Enable foreign key checks after truncation
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
@@ -225,20 +225,20 @@ class SalaryReportSeeder extends Seeder
         }
 
 
-        // --- LETTER FORMATS (Templates) ---
-        $formats = [
-            ['name' => 'Surat Peringatan', 'content' => 'Isi SP'],
-            ['name' => 'Surat Keterangan Kerja', 'content' => 'Isi SKK'],
-            ['name' => 'Surat Cuti', 'content' => 'Isi Pengajuan Cuti'],
-        ];
-        DB::table('letter_formats')->insert($formats);
+        // // --- LETTER FORMATS (Templates) ---
+        // $formats = [
+        //     ['name' => 'Surat Peringatan', 'content' => 'Isi SP'],
+        //     ['name' => 'Surat Keterangan Kerja', 'content' => 'Isi SKK'],
+        //     ['name' => 'Surat Cuti', 'content' => 'Isi Pengajuan Cuti'],
+        // ];
+        // DB::table('letter_formats')->insert($formats);
 
-        // --- LETTERS ---
-        $letters = [
-            ['letter_format_id' => 1, 'employee_id' => 1, 'name' => 'SP-001', 'status' => 1],
-            ['letter_format_id' => 3, 'employee_id' => 5, 'name' => 'CUTI-002', 'status' => 0],
-        ];
-        DB::table('letters')->insert($letters);
+        // // --- LETTERS ---
+        // $letters = [
+        //     ['letter_format_id' => 1, 'employee_id' => 1, 'name' => 'SP-001', 'status' => 1],
+        //     ['letter_format_id' => 3, 'employee_id' => 5, 'name' => 'CUTI-002', 'status' => 0],
+        // ];
+        // DB::table('letters')->insert($letters);
 
         echo "Seeder sukses dijalankan dengan " . count($allEmployees) . " karyawan dan total " . $totalCheckClocksCount . " data kehadiran/lembur selama 3 bulan.\n";
     }

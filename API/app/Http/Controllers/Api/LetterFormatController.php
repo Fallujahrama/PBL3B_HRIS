@@ -4,54 +4,105 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\LetterFormat;
-use App\Http\Resources\LetterFormatResource;
-use App\Http\Resources\LetterFormatCollection;
 use Illuminate\Http\Request;
 
 class LetterFormatController extends Controller
 {
+    // GET all templates
     public function index()
     {
-        $formats = LetterFormat::active()->paginate(10);
-        return new LetterFormatCollection($formats);
-    }
+        $data = LetterFormat::all();
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:100',
-            'content' => 'required',
-            'status' => 'required|integer',
+        return response()->json([
+            'success' => true,
+            'data' => $data
         ]);
-
-        $format = LetterFormat::create($validated);
-        return new LetterFormatResource($format);
     }
 
+    // GET single template
     public function show($id)
     {
-        $format = LetterFormat::active()->findOrFail($id);
-        return new LetterFormatResource($format);
+        $data = LetterFormat::find($id);
+
+        if (!$data) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Template tidak ditemukan'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ]);
     }
 
-    public function update(Request $request, $id)
+    // POST create new template
+    public function store(Request $request)
     {
-        $format = LetterFormat::active()->findOrFail($id);
-        $validated = $request->validate([
-            'name' => 'sometimes|string|max:100',
-            'content' => 'sometimes',
-            'status' => 'sometimes|integer',
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'content' => 'required|string',
         ]);
 
-        $format->update($validated);
-        return new LetterFormatResource($format);
+        $data = LetterFormat::create([
+            'name' => $request->input('name'),
+            'content' => $request->input('content'),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Template berhasil dibuat',
+            'data' => $data
+        ], 201);
     }
 
+    // PUT update template
+    public function update(Request $request, $id)
+    {
+        $data = LetterFormat::find($id);
+
+        if (!$data) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Template tidak ditemukan'
+            ], 404);
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'content' => 'required|string',
+        ]);
+
+        $data->update([
+            'name' => $request->input('name'),
+            'content' => $request->input('content'),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Template berhasil diupdate',
+            'data' => $data
+        ]);
+    }
+
+    // DELETE template
     public function destroy($id)
     {
-        $format = LetterFormat::findOrFail($id);
-        $format->deleted_at = now()->format('Y-m-d H:i:s'); // custom soft delete
-        $format->save();
-        return response()->json(['message' => 'deleted']);
+        $data = LetterFormat::find($id);
+
+        if (!$data) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Template tidak ditemukan'
+            ], 404);
+        }
+
+        $data->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Template berhasil dihapus'
+        ]);
     }
 }

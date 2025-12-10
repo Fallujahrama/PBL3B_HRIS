@@ -139,46 +139,6 @@ class EmployeeSeeder extends Seeder
         ]);
 
         // ======================================================
-        // =============== LETTER FORMATS ========================
-        // ======================================================
-        DB::table('letter_formats')->insert([
-            [
-                'name' => 'Surat Tugas',
-                'content' => '<p>Ini adalah template surat tugas.</p>',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'Surat Peringatan',
-                'content' => '<p>Ini adalah template surat peringatan.</p>',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ]);
-
-        // ======================================================
-        // =============== LETTERS ==============================
-        // ======================================================
-        DB::table('letters')->insert([
-            [
-                'letter_format_id' => 1,
-                'employee_id' => $emp1->id,
-                'name' => 'Surat Tugas - Project A',
-                'status' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'letter_format_id' => 2,
-                'employee_id' => $emp2->id,
-                'name' => 'Surat Peringatan - Kedisiplinan',
-                'status' => 0,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ]);
-
-        // ======================================================
         // =============== SCHEDULES ============================
         // ======================================================
         DB::table('schedules')->insert([
