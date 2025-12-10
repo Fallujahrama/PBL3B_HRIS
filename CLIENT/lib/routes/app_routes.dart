@@ -16,12 +16,35 @@ import '../features/department/screens/department_form_page.dart';
 import '../features/department/models/department.dart';
 import '../features/department/screens/department_map_page.dart';
 
+import '../features/home/screens/letter_home_screen.dart';
+import '../features/letter/screens/letter_list_screen.dart';
+import '../features/letter/screens/letter_create_screen.dart';
+import '../features/letter/screens/letter_detail_screen.dart';
+import '../features/letter/screens/letter_template_form_screen.dart';
+import '../features/letter/models/letter_format.dart';
+import '../features/letter/screens/employee_recap_page.dart';
+import '../features/form/screen/form_surat_page.dart';
+import '../features/form/screen/hrd_list_page.dart';
+import '../features/form/screen/hrd_detail_page.dart';
+
+
 class AppRoutes {
   // 🔹 tambahkan konstanta nama route
   static const String departmentList = 'departmentList';
   static const String departmentDetail = 'departmentDetail';
   static const String departmentForm = 'departmentForm';
   static const String departmentMap = 'departmentMap';
+
+  static const String letterHome = '/letter-home';
+  static const String formSurat = '/form-surat';
+  static const String hrdList = '/hrd-list';
+  static const String detailSurat = '/detail-surat';
+  static const String employeeRecap = '/employee-recap';
+  static const String letterList = '/letters';
+  static const String letterTemplateCreate = '/letter/template/create';
+  static const String letterTemplateEdit = '/letter/template/edit';
+  static const String letterCreate = '/letter/create';
+  static const String letterDetail = '/letter';
 
   static final router = GoRouter(
     initialLocation: '/',
@@ -105,6 +128,67 @@ class AppRoutes {
           final id = state.pathParameters['id']!;
           return EmployeeEditScreen(employeeId: id);
         },
+      ),
+      // ============================
+      // LETTER ROUTES
+      // ============================
+      GoRoute(
+        path: letterHome,
+        builder: (context, state) => const LetterHomeScreen(),
+      ),
+
+      // KARYAWAN ROUTES
+      GoRoute(
+        path: formSurat,
+        builder: (context, state) => const FormSuratPage(),
+      ),
+
+      // HRD ROUTES
+      GoRoute(
+        path: hrdList,
+        builder: (context, state) => const HrdListPage(),
+      ),
+      GoRoute(
+        path: detailSurat,
+        builder: (context, state) =>
+            HrdDetailPage(surat: state.extra as Map<String, dynamic>),
+      ),
+
+      // ADMIN ROUTES - Template Management
+      GoRoute(
+        path: letterList,
+        builder: (context, state) => const LettersListScreen(),
+      ),
+      GoRoute(
+        path: letterTemplateCreate,
+        builder: (context, state) => const LetterTemplateFormScreen(),
+      ),
+      GoRoute(
+        path: letterTemplateEdit,
+        builder: (context, state) {
+          final template = state.extra as LetterFormat;
+          return LetterTemplateFormScreen(template: template);
+        },
+      ),
+      GoRoute(
+        path: letterCreate,
+        builder: (context, state) {
+          final extra = state.extra as LetterFormat;
+          return LetterCreateScreen(jenisSurat: extra);
+        },
+      ),
+      GoRoute(
+        path: '$letterDetail/:id',
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return LetterDetailScreen(id: id);
+        },
+      ),
+
+      // LAPORAN
+      GoRoute(
+        path: employeeRecap,
+        builder: (context, state) => const EmployeeRecapPage(),
       ),
     ],
 
