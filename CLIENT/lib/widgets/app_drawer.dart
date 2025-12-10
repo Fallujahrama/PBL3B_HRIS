@@ -60,6 +60,13 @@ class AppDrawer extends StatelessWidget {
             title: const Text("Laporan Gaji Karyawan"),
             onTap: () => context.go('/summary-salary'),
           ),
+          
+          // ==== PENGAJUAN SURAT ====
+          ListTile(
+            leading: const Icon(Icons.mail),
+            title: const Text("Pengajuan Surat"),
+            onTap: () => context.go('/letter-home'),
+          ),
         ],
       ),
     );

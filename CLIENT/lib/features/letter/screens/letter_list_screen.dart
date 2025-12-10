@@ -1,0 +1,251 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../../theme/app_theme.dart';
+import '../controllers/letter_controller.dart';
+import '../models/letter_format.dart';
+
+class LettersListScreen extends StatefulWidget {
+  const LettersListScreen({super.key});
+
+  @override
+  State<LettersListScreen> createState() => _LettersListScreenState();
+}
+
+class _LettersListScreenState extends State<LettersListScreen> {
+  final controller = LetterController();
+  List<LetterFormat> formats = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
+
+  void loadData() async {
+    setState(() => isLoading = true);
+    try {
+      formats = await controller.fetchLetterFormats();
+      print('Loaded ${formats.length} formats');
+    } catch (e) {
+      print('Error loading formats: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+      formats = [];
+    }
+    setState(() => isLoading = false);
+  }
+
+  void _showTemplateDetail(LetterFormat format) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(format.name),
+        content: SingleChildScrollView(
+          child: Text(format.content),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => context.pop(),
+            child: const Text('Tutup'),
+          ),
+          TextButton.icon(
+            onPressed: () {
+              context.pop();
+              context.push('/letter/template/edit', extra: format);
+            },
+            icon: const Icon(Icons.edit),
+            label: const Text('Edit'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _deleteTemplate(LetterFormat format) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Hapus Template'),
+        content: Text('Apakah Anda yakin ingin menghapus template "${format.name}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => context.pop(false),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () => context.pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      try {
+        await controller.deleteLetterFormat(format.id);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Template berhasil dihapus'),
+              backgroundColor: AppTheme.secondaryGreen,
+            ),
+          );
+          loadData();
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: $e')),
+          );
+        }
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/letter-home'),
+        ),
+        title: const Text("Kelola Template Surat"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: loadData,
+          ),
+        ],
+      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : formats.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.description_outlined,
+                        size: 64,
+                        color: Colors.grey.shade400,
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        "Belum ada template surat",
+                        style: TextStyle(color: AppTheme.textGrey),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton.icon(
+                        onPressed: () => context.push('/letter/template/create'),
+                        icon: const Icon(Icons.add),
+                        label: const Text('Buat Template Baru'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryBlue,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: formats.length,
+                  itemBuilder: (_, i) {
+                    final item = formats[i];
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(16),
+                        leading: Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryBlue.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Center(
+                            child: Text(
+                              item.name.substring(0, 1).toUpperCase(),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                                color: AppTheme.primaryBlue,
+                              ),
+                            ),
+                          ),
+                        ),
+                        title: Text(
+                          item.name,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: AppTheme.textDark,
+                          ),
+                        ),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Text(
+                            item.content,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: AppTheme.textGrey,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                        trailing: PopupMenuButton(
+                          itemBuilder: (context) => [
+                            const PopupMenuItem(
+                              value: 'edit',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.edit, size: 20, color: AppTheme.primaryBlue),
+                                  SizedBox(width: 8),
+                                  Text('Edit'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'delete',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.delete, size: 20, color: Colors.red),
+                                  SizedBox(width: 8),
+                                  Text('Hapus', style: TextStyle(color: Colors.red)),
+                                ],
+                              ),
+                            ),
+                          ],
+                          onSelected: (value) {
+                            if (value == 'edit') {
+                              context.push('/letter/template/edit', extra: item);
+                            } else if (value == 'delete') {
+                              _deleteTemplate(item);
+                            }
+                          },
+                        ),
+                        onTap: () => _showTemplateDetail(item),
+                      ),
+                    );
+                  },
+                ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          final result = await context.push('/letter/template/create');
+          if (result == true) loadData();
+        },
+        backgroundColor: AppTheme.primaryBlue,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add),
+        label: const Text('Buat Template'),
+      ),
+    );
+  }
+}
