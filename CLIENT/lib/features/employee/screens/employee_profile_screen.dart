@@ -45,10 +45,10 @@ Future<void> fetchEmployeeData() async {
       return;
     }
 
-    final url = Uri.parse("http://10.0.2.2:8000/api/employee/profile");
+    final url = Uri.parse("http://127.0.0.1:8000/api/employee/profile");
 
     final response = await http.get(
-  Uri.parse("http://localhost:8000/api/employee/profile"),
+  Uri.parse("http://127.0.0.1:8000/api/employee/profile"),
   headers: {
     "Authorization": "Bearer $token",
     "Accept": "application/json",
@@ -153,7 +153,7 @@ Future<void> fetchEmployeeData() async {
 
           // position — AMBIL DARI RELASI USER
           Text(
-            employeeData!["position"]?? "-",
+            employeeData!["position"]["name"]?? "-",
             style: const TextStyle(
               fontSize: 15,
               color: Colors.grey,

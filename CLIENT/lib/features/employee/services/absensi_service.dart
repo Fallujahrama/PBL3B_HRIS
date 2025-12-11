@@ -45,22 +45,24 @@ class AbsensiService {
         "$baseUrl/employee/absensi/report?month=${month ?? ''}&year=$year";
 
     final res = await http.get(
-      Uri.parse(url),
-      headers: {
-        "Authorization": "Bearer $token",
-        "Accept": "application/json",
-      },
-    );
+  Uri.parse(url),
+  headers: {
+    "Authorization": "Bearer $token",
+    "Accept": "application/json",
+  },
+);
 
-    if (res.statusCode == 200) {
-      final jsonData = jsonDecode(res.body);
+print("ABSENSI RAW RESPONSE: ${res.body}");  // <-- Tambahkan ini
 
-      if (jsonData["data"] is List) {
-        return List<Map<String, dynamic>>.from(jsonData["data"]);
-      }
-      throw "Format JSON salah";
-    }
+if (res.statusCode == 200) {
+  final jsonData = jsonDecode(res.body);
 
-    throw "Gagal mengambil data absensi (${res.statusCode})";
+  if (jsonData["data"] is List) {
+    return List<Map<String, dynamic>>.from(jsonData["data"]);
+  }
+  throw "Format JSON salah";
+}
+
+    throw "Gagal mengambil data absensi";
   }
 }

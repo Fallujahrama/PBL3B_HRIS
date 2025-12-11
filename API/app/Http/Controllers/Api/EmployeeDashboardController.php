@@ -4,26 +4,25 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Employee;
-use App\Models\Absensi;
+use App\Models\CheckClock;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class EmployeeDashboardController extends Controller
 {
-    // ===========================================
+    // =============================
     // DASHBOARD SUMMARY
-    // ===========================================
+    // =============================
     public function getDashboardSummary(Request $request)
     {
         try {
             $user = Auth::user();
-            
-            // Ambil data employee dengan relasi
+
             $employee = Employee::with(['position', 'department'])
                 ->where('user_id', $user->id)
                 ->first();
-            
+
             if (!$employee) {
                 return response()->json([
                     'success' => false,
@@ -31,271 +30,250 @@ class EmployeeDashboardController extends Controller
                 ], 404);
             }
 
-            // Hitung bulan ini
-            $currentMonth = Carbon::now()->month;
-            $currentYear = Carbon::now()->year;
+            $month = Carbon::now()->month;
+            $year = Carbon::now()->year;
 
-            // Kehadiran bulanan (jumlah hari hadir)
-            $monthlyAttendance = Absensi::where('employee_id', $employee->id)
-                ->whereYear('tanggal', $currentYear)
-                ->whereMonth('tanggal', $currentMonth)
-                ->whereIn('status', ['hadir', 'present', 'H'])
-                ->count();
+            // Hanya status hadir
+            $hadir = CheckClock::where('employee_id', $employee->id)
+    ->whereYear('date', $year)
+    ->whereMonth('date', $month)
+    ->where('status', 'hadir')
+    ->count();
 
-            // Hitung total jam lembur bulanan (dari jam_pulang > 16:00)
-            $monthlyOvertimeHours = $this->calculateMonthlyOvertime($employee->id, $currentYear, $currentMonth);
+    
+// Dinas (mengganti posisi "telat")
+$dinas = CheckClock::where('employee_id', $employee->id)
+    ->whereYear('date', $year)
+    ->whereMonth('date', $month)
+    ->where('status', 'dinas')
+    ->count();
+
+// Izin = cuti
+$cuti = CheckClock::where('employee_id', $employee->id)
+    ->whereYear('date', $year)
+    ->whereMonth('date', $month)
+    ->where('status', 'cuti')
+    ->count();
+
+// Sakit
+$sakit = CheckClock::where('employee_id', $employee->id)
+    ->whereYear('date', $year)
+    ->whereMonth('date', $month)
+    ->where('status', 'sakit')
+    ->count();
+
+            // Hitung lembur
+            $monthlyOvertime = $this->calculateMonthlyOvertime($employee->id, $year, $month);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Data dashboard berhasil diambil',
                 'data' => [
                     'employee' => [
-                        'id' => $employee->id,
-                        'name' => trim($employee->first_name . ' ' . $employee->last_name),
-                        'email' => $user->email,
-                        'position' => $employee->position->name ?? '-',
-                        'department' => $employee->department->name ?? '-',
+                        'id'        => $employee->id,
+                        'name'      => trim($employee->first_name . ' ' . $employee->last_name),
+                        'email'     => $user->email,
+                        'position'  => $employee->position->name ?? '-',
+                        'department'=> $employee->department->name ?? '-',
                     ],
-                    'monthly_attendance' => $monthlyAttendance,
-                    'monthly_overtime' => $monthlyOvertimeHours,
-                ]
-            ], 200);
-
+                    'monthly_attendance' => $hadir ,
+                    'monthly_dinas'      => $dinas,
+                    'monthly_cuti'       => $cuti,
+                    'monthly_sakit'      => $sakit,
+                    'monthly_overtime'   => $monthlyOvertime,
+                ],
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal mengambil data dashboard',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
 
-    // ===========================================
-    // GRAFIK KEHADIRAN MINGGUAN
-    // ===========================================
+    // =============================
+    // WEEKLY CHART
+    // =============================
     public function getWeeklyAttendance(Request $request)
     {
         try {
             $user = Auth::user();
             $employee = Employee::where('user_id', $user->id)->first();
-            
+
             if (!$employee) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Data karyawan tidak ditemukan'
-                ], 404);
+                return response()->json(['success' => false, 'message' => 'Data karyawan tidak ditemukan'], 404);
             }
 
-            // 7 hari terakhir
-            $startDate = Carbon::now()->subDays(6)->startOfDay();
-            $endDate = Carbon::now()->endOfDay();
+            $start = Carbon::now()->subDays(6)->startOfDay();
+            $end   = Carbon::now()->endOfDay();
 
-            // Ambil data absensi
-            $absensiList = Absensi::where('employee_id', $employee->id)
-                ->whereBetween('tanggal', [$startDate, $endDate])
-                ->orderBy('tanggal', 'asc')
+            $records = CheckClock::where('employee_id', $employee->id)
+                ->whereBetween('date', [$start, $end])
+                ->orderBy('date')
                 ->get()
-                ->keyBy(function ($item) {
-                    return Carbon::parse($item->tanggal)->format('Y-m-d');
-                });
+                ->keyBy(fn($r) => Carbon::parse($r->date)->format('Y-m-d'));
 
-            // Format data untuk chart (7 hari)
-            $chartData = [];
+            $chart = [];
+
             for ($i = 6; $i >= 0; $i--) {
-                $date = Carbon::now()->subDays($i);
-                $dateStr = $date->format('Y-m-d');
-                $dayName = $date->locale('id')->isoFormat('ddd');
-                
-                $absensi = $absensiList->get($dateStr);
-                
-                // 1 = hadir, 0 = tidak hadir/izin/alpha
+                $day = Carbon::now()->subDays($i);
+                $key = $day->format('Y-m-d');
+
+                $rec = $records->get($key);
+
                 $value = 0;
                 $status = 'alpha';
-                
-                if ($absensi) {
-                    $status = $absensi->status;
-                    if (in_array(strtolower($absensi->status), ['hadir', 'present', 'h'])) {
+                $clockIn = null;
+                $clockOut = null;
+
+                if ($rec) {
+                    $status = $rec->status;
+                    $clockIn = $rec->clock_in;
+                    $clockOut = $rec->clock_out;
+
+                    if ($rec->status === 'hadir') {
                         $value = 1;
                     }
                 }
 
-                $chartData[] = [
-                    'date' => $dateStr,
-                    'day' => $dayName,
-                    'value' => $value,
-                    'status' => $status,
-                    'jam_masuk' => $absensi->jam_masuk ?? null,
-                    'jam_pulang' => $absensi->jam_pulang ?? null,
+                $chart[] = [
+                    'date'      => $key,
+                    'day'       => $day->locale('id')->isoFormat('ddd'),
+                    'value'     => $value,
+                    'status'    => $status,
+                    'clock_in'  => $clockIn,
+                    'clock_out' => $clockOut,
                 ];
             }
 
             return response()->json([
                 'success' => true,
                 'message' => 'Data kehadiran mingguan berhasil diambil',
-                'data' => $chartData
-            ], 200);
-
+                'data' => $chart,
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal mengambil data kehadiran',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
 
-    // ===========================================
-    // RIWAYAT ABSENSI
-    // ===========================================
+    // =============================
+    // ABSENSI HISTORY
+    // =============================
     public function getAttendanceHistory(Request $request)
     {
         try {
             $user = Auth::user();
             $employee = Employee::where('user_id', $user->id)->first();
-            
+
             if (!$employee) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Data karyawan tidak ditemukan'
-                ], 404);
+                return response()->json(['success' => false, 'message' => 'Data karyawan tidak ditemukan'], 404);
             }
 
-            // Parameter filter
             $month = $request->input('month', Carbon::now()->month);
-            $year = $request->input('year', Carbon::now()->year);
+            $year  = $request->input('year', Carbon::now()->year);
             $perPage = $request->input('per_page', 31);
 
-            // Query riwayat absensi
-            $query = Absensi::where('employee_id', $employee->id)
-                ->whereYear('tanggal', $year)
-                ->whereMonth('tanggal', $month)
-                ->orderBy('tanggal', 'desc');
+            $list = CheckClock::where('employee_id', $employee->id)
+                ->whereYear('date', $year)
+                ->whereMonth('date', $month)
+                ->orderBy('date', 'desc')
+                ->paginate($perPage);
 
-            $absensiList = $query->paginate($perPage);
-
-            // Format data
-            $formattedData = $absensiList->map(function ($absensi) {
+            $formatted = $list->map(function ($c) {
                 return [
-                    'id' => $absensi->id,
-                    'tanggal' => $absensi->tanggal,
-                    'tanggal_formatted' => Carbon::parse($absensi->tanggal)->locale('id')->isoFormat('dddd, D MMMM YYYY'),
-                    'status' => $absensi->status,
-                    'jam_masuk' => $absensi->jam_masuk,
-                    'jam_pulang' => $absensi->jam_pulang,
+                    'id'            => $c->id,
+                    'date'          => $c->date,
+                    'date_formatted'=> Carbon::parse($c->date)->locale('id')->isoFormat('dddd, D MMMM YYYY'),
+                    'status'        => $c->status,
+                    'clock_in'      => $c->clock_in,
+                    'clock_out'     => $c->clock_out,
                 ];
             });
 
-            // Hitung ringkasan
-            $summary = Absensi::where('employee_id', $employee->id)
-                ->whereYear('tanggal', $year)
-                ->whereMonth('tanggal', $month)
-                ->select('status', DB::raw('count(*) as total'))
+            // Summary
+            $summary = CheckClock::where('employee_id', $employee->id)
+                ->whereYear('date', $year)
+                ->whereMonth('date', $month)
+                ->select('status', DB::raw('COUNT(*) as total'))
                 ->groupBy('status')
                 ->pluck('total', 'status');
 
             return response()->json([
                 'success' => true,
                 'message' => 'Data riwayat absensi berhasil diambil',
-                'data' => $formattedData,
+                'data' => $formatted,
                 'summary' => [
-                    'hadir' => $summary['hadir'] ?? $summary['H'] ?? 0,
-                    'izin' => $summary['izin'] ?? $summary['I'] ?? 0,
-                    'sakit' => $summary['sakit'] ?? $summary['S'] ?? 0,
-                    'alpha' => $summary['alpha'] ?? $summary['A'] ?? 0,
+                    'hadir' => $summary['hadir'] ?? 0,
+                    'sakit' => $summary['sakit'] ?? 0,
+                    'dinas' => $summary['dinas'] ?? 0,
+                    'cuti'  => $summary['cuti'] ?? 0,
                 ],
                 'pagination' => [
-                    'current_page' => $absensiList->currentPage(),
-                    'last_page' => $absensiList->lastPage(),
-                    'per_page' => $absensiList->perPage(),
-                    'total' => $absensiList->total(),
+                    'current_page' => $list->currentPage(),
+                    'last_page'    => $list->lastPage(),
+                    'per_page'     => $list->perPage(),
+                    'total'        => $list->total(),
                 ],
-                'filter' => [
-                    'month' => (int)$month,
-                    'year' => (int)$year,
-                ]
-            ], 200);
+            ]);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal mengambil data absensi',
-                'error' => $e->getMessage()
-            ], 500);
+            return response()->json(['success' => false, 'message' => 'Error', 'error' => $e->getMessage()], 500);
         }
     }
 
-    // ===========================================
-    // RIWAYAT LEMBUR (dari jam_pulang > 16:00)
-    // ===========================================
+    // =============================
+    // OVERTIME HISTORY
+    // =============================
     public function getOvertimeHistory(Request $request)
     {
         try {
             $user = Auth::user();
             $employee = Employee::where('user_id', $user->id)->first();
-            
+
             if (!$employee) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Data karyawan tidak ditemukan'
-                ], 404);
+                return response()->json(['success' => false, 'message' => 'Data karyawan tidak ditemukan'], 404);
             }
 
-            // Ambil parameter
-            $perPage = $request->input('per_page', 10);
-            $month = $request->input('month', Carbon::now()->month);
-            $year = $request->input('year', Carbon::now()->year);
+            $month = $request->month ?? Carbon::now()->month;
+            $year  = $request->year ?? Carbon::now()->year;
 
-            // Query absensi yang ada lembur (jam_pulang > 16:00)
-            $query = Absensi::where('employee_id', $employee->id)
-                ->whereNotNull('jam_pulang')
-                ->whereYear('tanggal', $year)
-                ->whereMonth('tanggal', $month)
-                ->orderBy('tanggal', 'desc');
+            $records = CheckClock::where('employee_id', $employee->id)
+                ->whereYear('date', $year)
+                ->whereMonth('date', $month)
+                ->orderBy('date', 'desc')
+                ->get();
 
-            $absensiList = $query->paginate($perPage);
+            $result = [];
 
-            // Filter dan format data yang benar-benar lembur
-            $overtimeData = [];
-            foreach ($absensiList as $absensi) {
-                $overtimeHours = $this->calculateOvertimeHours($absensi->jam_pulang);
-                
-                if ($overtimeHours > 0) {
-                    $overtimeData[] = [
-                        'id' => $absensi->id,
-                        'date' => $absensi->tanggal,
-                        'jam_pulang' => $absensi->jam_pulang,
-                        'hours' => $overtimeHours . 'h',
-                        'hours_value' => $overtimeHours,
-                        'description' => 'Pulang jam ' . $absensi->jam_pulang,
+            foreach ($records as $r) {
+                $hours = $this->calculateOvertimeHours($r);
+                if ($hours > 0) {
+                    $result[] = [
+                        'id'        => $r->id,
+                        'date'      => $r->date,
+                        'clock_out' => $r->clock_out,
+                        'hours'     => $hours . 'h',
+                        'hours_value' => $hours,
                     ];
                 }
             }
 
             return response()->json([
                 'success' => true,
-                'message' => 'Data riwayat lembur berhasil diambil',
-                'data' => $overtimeData,
-                'pagination' => [
-                    'current_page' => $absensiList->currentPage(),
-                    'last_page' => $absensiList->lastPage(),
-                    'per_page' => $absensiList->perPage(),
-                    'total' => count($overtimeData),
-                ]
-            ], 200);
+                'message' => 'Data lembur berhasil diambil',
+                'data' => $result,
+            ]);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal mengambil data lembur',
-                'error' => $e->getMessage()
-            ], 500);
+            return response()->json(['success' => false, 'message' => 'Error', 'error' => $e->getMessage()], 500);
         }
     }
-
-    // ===========================================
-    // PROFIL KARYAWAN
-    // ===========================================
-    public function getProfile(Request $request)
+     public function getProfile(Request $request)
     {
         try {
             $user = Auth::user();
@@ -341,52 +319,36 @@ class EmployeeDashboardController extends Controller
             ], 500);
         }
     }
-
-    // ===========================================
-    // HELPER METHODS
-    // ===========================================
-    
-    /**
-     * Hitung jam lembur dari jam pulang
-     * Jika pulang > 16:00, selisihnya adalah lembur
-     */
-    private function calculateOvertimeHours($jamPulang)
+    // =============================
+    // HELPER
+    // =============================
+    private function calculateOvertimeHours($rec)
     {
-        if (!$jamPulang) return 0;
-
-        try {
-            // Parse jam pulang
-            $checkout = Carbon::createFromFormat('H:i:s', $jamPulang);
-            $cutoffTime = Carbon::createFromFormat('H:i:s', '16:00:00');
-
-            // Kalau pulang setelah jam 4 sore
-            if ($checkout->greaterThan($cutoffTime)) {
-                $diffInMinutes = $checkout->diffInMinutes($cutoffTime);
-                return round($diffInMinutes / 60, 1); // Konversi ke jam (1 desimal)
-            }
-
-            return 0;
-        } catch (\Exception $e) {
-            return 0;
+        // Jika lembur berdasarkan tipe
+        if ($rec->check_clock_type == 1 && $rec->overtime_start && $rec->overtime_end) {
+            $start = Carbon::parse($rec->overtime_start);
+            $end   = Carbon::parse($rec->overtime_end);
+            return round($end->diffInMinutes($start) / 60, 1);
         }
+
+        // Jika pulang lebih dari jam 16:00
+        if ($rec->clock_out > '16:00:00') {
+            $cutoff = Carbon::createFromTime(16, 0);
+            $out    = Carbon::parse($rec->clock_out);
+            return round($out->diffInMinutes($cutoff) / 60, 1);
+        }
+
+        return 0;
     }
 
-    /**
-     * Hitung total jam lembur dalam sebulan
-     */
     private function calculateMonthlyOvertime($employeeId, $year, $month)
     {
-        $absensiList = Absensi::where('employee_id', $employeeId)
-            ->whereYear('tanggal', $year)
-            ->whereMonth('tanggal', $month)
-            ->whereNotNull('jam_pulang')
-            ->get();
+        $records = CheckClock::where('employee_id', $employeeId)
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->where('check_clock_type', 1)
+            ->count();
 
-        $totalOvertime = 0;
-        foreach ($absensiList as $absensi) {
-            $totalOvertime += $this->calculateOvertimeHours($absensi->jam_pulang);
-        }
-
-        return round($totalOvertime, 1);
+        return $records;
     }
 }

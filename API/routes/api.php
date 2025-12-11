@@ -65,11 +65,17 @@ Route::prefix('employee')->middleware('auth:api')->group(function () {
     Route::get('/overtime/history', [EmployeeDashboardController::class, 'getOvertimeHistory']);
 
     // Profile
-    // Profile (gunakan 1 endpoint saja)
-    Route::get('/profile', [UserController::class, 'profile']);
-    Route::put('/profile', [EmployeeController::class, 'updateprofile']);
-
+    Route::get('/profile', [EmployeeDashboardController::class, 'getProfile']); 
+    Route::get('/user/profile', [UserController::class, 'profile']); 
+    Route::put('/profile', [UserController::class, 'editprofile']);
 
     // Absensi Report
     Route::get('/absensi/report', [AbsensiController::class, 'report']);
+
+    // ==========================================
+    // SLIP GAJI (Route Baru)
+    // Endpoint: /api/employee/salary-slip
+    // ==========================================
+    Route::get('/salary-slip', [SalaryController::class, 'getSalarySlip']);
+    
 });

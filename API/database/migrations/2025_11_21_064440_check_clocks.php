@@ -14,15 +14,25 @@ return new class extends Migration
         Schema::create('check_clocks', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('employee_id');
-            $table->boolean('check_clock_type'); // 0=Reguler, 1=Lembur
+            
+            // 0 = Reguler, 1 = Lembur
+            $table->boolean('check_clock_type');
+            
+            // Status kehadiran
+            $table->enum('status', ['hadir', 'sakit', 'dinas', 'cuti'])->default('hadir');
+
             $table->timestamp('date');
             $table->time('clock_in');
             $table->time('clock_out');
             $table->time('overtime_start')->nullable();
             $table->time('overtime_end')->nullable();
+
             $table->timestamps();
 
-            $table->foreign('employee_id')->references('id')->on('employees')->onDelete('cascade');
+            $table->foreign('employee_id')
+                ->references('id')
+                ->on('employees')
+                ->onDelete('cascade');
         });
     }
 
