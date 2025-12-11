@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name', 100)->nullable();
             $table->string('radius', 50)->nullable();
+            $table->decimal('base_salary', 12, 2)->default(0);
+            $table->decimal('allowance_default', 12, 2)->default(0);
             $table->timestamps();
         });
     }

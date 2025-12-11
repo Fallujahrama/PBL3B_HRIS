@@ -13,9 +13,18 @@ return new class extends Migration
     {
         Schema::create('positions', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100)->nullable();
-            $table->float('rate_reguler', 8, 2)->nullable();
-            $table->float('rate_overtime', 8, 2)->nullable();
+            $table->string('name');
+
+            // Gaji dasar
+            $table->decimal('base_salary', 12, 2)->default(0);
+
+            // Rate per jam / per hari
+            $table->decimal('rate_reguler', 12, 2)->default(0);
+            $table->decimal('rate_overtime', 12, 2)->default(0);
+
+            // Tunjangan tetap
+            $table->decimal('allowance', 12, 2)->default(0);
+
             $table->timestamps();
         });
     }
