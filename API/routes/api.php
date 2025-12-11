@@ -7,6 +7,9 @@ use App\Http\Controllers\Api\LetterController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\PositionController;
 use App\Http\Controllers\Api\SalaryReportController;
+use App\Models\Absensi;
+use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\EmployeeDashboardController;
 
 Route::apiResource('departments', DepartmentController::class);
 
@@ -52,3 +55,21 @@ Route::get('/letters/{id}/download', [LetterController::class, 'download']);
 Route::get('/employee-recap', [EmployeeRecapController::class, 'index']);
 Route::get('/employee-recap/download', [EmployeeRecapController::class, 'download']);
 Route::get('/employee-recap/pdf', [EmployeeRecapController::class, 'downloadPdf']);
+
+Route::prefix('employee')->middleware('auth:api')->group(function () {
+
+    // Dashboard & Attendance
+    Route::get('/dashboard/summary', [EmployeeDashboardController::class, 'getDashboardSummary']);
+    Route::get('/dashboard/weekly-attendance', [EmployeeDashboardController::class, 'getWeeklyAttendance']);
+    Route::get('/attendance/history', [EmployeeDashboardController::class, 'getAttendanceHistory']);
+    Route::get('/overtime/history', [EmployeeDashboardController::class, 'getOvertimeHistory']);
+
+    // Profile
+    // Profile (gunakan 1 endpoint saja)
+    Route::get('/profile', [UserController::class, 'profile']);
+    Route::put('/profile', [EmployeeController::class, 'updateprofile']);
+
+
+    // Absensi Report
+    Route::get('/absensi/report', [AbsensiController::class, 'report']);
+});

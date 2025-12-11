@@ -26,6 +26,9 @@ import '../features/letter/screens/employee_recap_page.dart';
 import '../features/form/screen/form_surat_page.dart';
 import '../features/form/screen/hrd_list_page.dart';
 import '../features/form/screen/hrd_detail_page.dart';
+import '../features/employee/screens/employee_salary_screen.dart';
+import '../features/employee/screens/employee_report_screen.dart';
+import '../features/employee/screens/employee_profile_screen.dart';
 
 
 class AppRoutes {
@@ -190,8 +193,24 @@ class AppRoutes {
         path: employeeRecap,
         builder: (context, state) => const EmployeeRecapPage(),
       ),
-    ],
 
-    
+
+  
+
+      GoRoute(
+        path: '/employee/salary',
+        builder: (context, state) => const EmployeeSalaryScreen(),
+      ),
+
+      GoRoute(
+        path: '/employee/report',
+        builder: (context, state) => const EmployeeReportScreen(),
+      ),
+      GoRoute(
+        path: '/employee/profile',
+        builder: (context, state) => const ProfilePage(),
+      ),
+      
+    ],
   );
 }

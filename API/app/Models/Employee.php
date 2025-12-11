@@ -11,6 +11,21 @@ class Employee extends Model
     
     protected $table = 'employees';
     protected $guarded = [];
+    protected $fillable = [
+        'user_id',
+        'position_id',
+        'department_id',
+        'first_name',
+        'last_name',
+        'gender',
+        'address',
+    ];
+
+    protected $casts = [
+        'user_id' => 'integer',
+        'position_id' => 'integer',
+        'department_id' => 'integer',
+    ];
 
     public function user()
     {
@@ -33,5 +48,16 @@ class Employee extends Model
     public function letters()
     {
         return $this->hasMany(Letter::class, 'employee_id');
+    }
+    // Employee → Absensi
+    public function absensi()
+    {
+        return $this->hasMany(Absensi::class);
+    }
+
+    // Employee → Salary Reports
+    public function salaryReports()
+    {
+        return $this->hasMany(SalaryReport::class);
     }
 }
