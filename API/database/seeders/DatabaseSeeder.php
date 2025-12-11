@@ -14,12 +14,13 @@ class DatabaseSeeder extends Seeder
         // $this->call(UsersSeeder::class);
         $this->call(LetterFormatSeeder::class);
         $this->call(EmployeeSeeder::class);
-
+        $this->call(CheckClocksSeeder::class);
 
         $this->call([
             //LetterFormatsSeeder::class,
             //LettersSeeder::class,
             DepartmentSeeder::class,
+            
         ]);
 
         $this->call(PositionSeeder::class);

@@ -67,6 +67,36 @@ class AppDrawer extends StatelessWidget {
             title: const Text("Pengajuan Surat"),
             onTap: () => context.go('/letter-home'),
           ),
+          ListTile(
+            leading: const Icon(Icons.dashboard),
+            title: const Text('Dashboard'),
+            onTap: () => context.go('/employee-dashboard'),
+          ),
+
+          ListTile(
+            leading: const Icon(Icons.money),
+            title: const Text('Gaji'),
+            onTap: () => context.go('/employee/salary'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.insert_chart),
+            title: const Text('Report Absensi'),
+            onTap: () => context.go('/employee/report'),
+          ),
+
+          ListTile(
+            leading: const Icon(Icons.person),
+            title: const Text('Profile'),
+            onTap: () => context.go('/employee/profile'),
+          ),
+
+          const Divider(),
+
+          ListTile(
+            leading: const Icon(Icons.logout),
+            title: const Text('Logout'),
+            onTap: () => context.go('/login'),
+          ),
         ],
       ),
     );

@@ -64,4 +64,40 @@ class UserController extends Controller
             ]
         ]);
     }
+     public function editprofile(Request $request)
+{
+    $user = $request->user();
+    $employee = $user->employee;
+
+    if (!$employee) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Employee data tidak ditemukan'
+        ], 404);
+    }
+
+    // Validasi input
+    $validated = $request->validate([
+        'first_name' => 'required|string|max:100',
+        'last_name' => 'required|string|max:100',
+        'address' => 'nullable|string|max:255',
+    ]);
+
+    // Update data employee
+    $employee->update([
+        'first_name' => $validated['first_name'],
+        'last_name'  => $validated['last_name'],
+        'address'    => $validated['address'] ?? $employee->address,
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Profil berhasil diperbarui',
+        'data' => [
+            'first_name' => $employee->first_name,
+            'last_name'  => $employee->last_name,
+            'address'    => $employee->address,
+        ]
+    ], 200);
+}
 }
