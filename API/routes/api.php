@@ -9,7 +9,11 @@ use App\Http\Controllers\Api\PositionController;
 use App\Http\Controllers\Api\SalaryReportController;
 use App\Models\Absensi;
 use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\Api\EmployeeRecapController;
+use App\Http\Controllers\Api\LetterSubmissionController;
 use App\Http\Controllers\EmployeeDashboardController;
+use App\Http\Controllers\SalaryController;
+use App\Http\Controllers\UserController;
 
 Route::apiResource('departments', DepartmentController::class);
 
@@ -65,8 +69,8 @@ Route::prefix('employee')->middleware('auth:api')->group(function () {
     Route::get('/overtime/history', [EmployeeDashboardController::class, 'getOvertimeHistory']);
 
     // Profile
-    Route::get('/profile', [EmployeeDashboardController::class, 'getProfile']); 
-    Route::get('/user/profile', [UserController::class, 'profile']); 
+    Route::get('/profile', [EmployeeDashboardController::class, 'getProfile']);
+    Route::get('/user/profile', [UserController::class, 'profile']);
     Route::put('/profile', [UserController::class, 'editprofile']);
 
     // Absensi Report
@@ -77,5 +81,5 @@ Route::prefix('employee')->middleware('auth:api')->group(function () {
     // Endpoint: /api/employee/salary-slip
     // ==========================================
     Route::get('/salary-slip', [SalaryController::class, 'getSalarySlip']);
-    
+
 });
