@@ -26,7 +26,7 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: Theme.of(context).colorScheme.primary,
       body: Center(
         child: Text(
-          "HRIS SIB #B",
+          "HRIS SIB 3B",
           style: TextStyle(
             fontSize: 32,
             color: Colors.white,

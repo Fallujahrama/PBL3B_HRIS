@@ -17,6 +17,7 @@ import '../features/department/models/department.dart';
 import '../features/department/screens/department_map_page.dart';
 
 import '../features/home/screens/letter_home_screen.dart';
+import '../features/master-data/screens/master_data_screen.dart';
 import '../features/letter/screens/letter_list_screen.dart';
 import '../features/letter/screens/letter_create_screen.dart';
 import '../features/letter/screens/letter_detail_screen.dart';
@@ -61,6 +62,11 @@ class AppRoutes {
         path: '/home',
         name: 'home',
         builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: '/master-data',
+        name: 'master-data',
+        builder: (context, state) => const MasterDataScreen(),
       ),
       GoRoute(
         path: '/summary-salary',
