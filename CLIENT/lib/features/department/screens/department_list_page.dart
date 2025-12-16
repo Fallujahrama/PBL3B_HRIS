@@ -157,12 +157,16 @@ class _DepartmentListPageState extends State<DepartmentListPage> {
 
       appBar: AppBar(
         title: const Text(
-          "MASTER DEPARTMENTS",
+          "Data Department",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
         ),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0.5,
+        leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => context.go('/master-data'),
+        ),
       ),
 
       floatingActionButton: FloatingActionButton(
