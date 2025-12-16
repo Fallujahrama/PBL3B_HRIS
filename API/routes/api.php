@@ -92,4 +92,5 @@ Route::prefix('employee')->middleware('auth:api')->group(function () {
     // Endpoint: /api/employee/salary-slip
     // ==========================================
     Route::get('/salary-slip', [SalaryController::class, 'getSalarySlip']);
+
 });
