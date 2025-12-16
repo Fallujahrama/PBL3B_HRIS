@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hris_3B/widgets/app_drawer.dart';
 import 'package:provider/provider.dart';
 import '../controllers/employee_recap_controller.dart';
 import 'employee_recap_detail_page.dart';
@@ -40,12 +41,13 @@ class _EmployeeRecapPageState extends State<EmployeeRecapPage> {
             if (controller.isLoading) {
               return Scaffold(
                 appBar: AppBar(
-                  leading: IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () => context.go('/letter-home'),
-                  ),
+                  // leading: IconButton(
+                  //   icon: const Icon(Icons.arrow_back),
+                  //   onPressed: () => context.go('/admin-dashboard'),
+                  // ),
                   title: const Text('Laporan Rekap Karyawan'),
                 ),
+                drawer: const AppDrawer(),
                 body: const Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -62,12 +64,14 @@ class _EmployeeRecapPageState extends State<EmployeeRecapPage> {
             if (controller.error != null) {
               return Scaffold(
                 appBar: AppBar(
-                  leading: IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () => context.go('/letter-home'),
-                  ),
+                  
+                  // leading: IconButton(
+                  //   icon: const Icon(Icons.arrow_back),
+                  //   onPressed: () => context.go('/admin-dashboard'),
+                  // ),
                   title: const Text('Laporan Rekap Karyawan'),
                 ),
+                drawer: const AppDrawer(),
                 body: Center(
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
@@ -117,11 +121,12 @@ class _EmployeeRecapPageState extends State<EmployeeRecapPage> {
 
             return Scaffold(
               appBar: AppBar(
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () => context.go('/letter-home'),
-                ),
+                // leading: IconButton(
+                //   icon: const Icon(Icons.arrow_back),
+                //   onPressed: () => context.go('/admin-dashboard'),
+                // ),
                 title: const Text('Laporan Rekap Karyawan'),
+                
                 actions: [
                   IconButton(
                     icon: const Icon(Icons.refresh),
@@ -129,6 +134,7 @@ class _EmployeeRecapPageState extends State<EmployeeRecapPage> {
                   ),
                 ],
               ),
+              drawer: const AppDrawer(),
               body: Column(
                 children: [
                   // Search Bar

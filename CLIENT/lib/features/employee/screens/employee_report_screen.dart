@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hris_3B/widgets/app_drawer.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:go_router/go_router.dart';
@@ -282,11 +283,12 @@ class _EmployeeReportScreenState extends State<EmployeeReportScreen> {
         foregroundColor: Colors.white,
         title: const Text("Rangkuman Kehadiran"),
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/employee-dashboard'),
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back),
+        //   onPressed: () => context.go('/employee-dashboard'),
+        // ),
       ),
+      drawer: const AppDrawer(),
       body: loading
           ? const Center(child: CircularProgressIndicator())
           : Padding(

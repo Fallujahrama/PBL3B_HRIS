@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Employee;
@@ -54,7 +55,7 @@ class AuthController extends Controller
         $user = Auth::user();
 
         // 5. Cek relasi employee
-        $employee = Employee::where('user_id', $user->id)->first();
+        $employee = Employee::with('department', 'position')->where('user_id', $user->id)->first();
 
         return response()->json([
             'success' => true,
@@ -70,6 +71,9 @@ class AuthController extends Controller
                     'last_name'   => $employee->last_name,
                     'phone'       => $employee->phone,
                     'address'     => $employee->address,
+                    'position'    => $employee->position,
+                    'department'  => $employee->department,
+
                 ] : null
             ]
         ]);

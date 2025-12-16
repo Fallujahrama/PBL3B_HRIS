@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hris_3B/widgets/app_drawer.dart';
 import 'package:intl/intl.dart';
 import '../services/api_service.dart';
 import '../../../routes/app_routes.dart';
@@ -83,10 +84,10 @@ class _HrdListPageState extends State<HrdListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/letter-home'),
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back),
+        //   onPressed: () => context.go('/admin-dashboard'),
+        // ),
         title: const Text("Approval HRD"),
         actions: [
           IconButton(
@@ -95,6 +96,7 @@ class _HrdListPageState extends State<HrdListPage> {
           ),
         ],
       ),
+      drawer: const AppDrawer(),
       body: loading
           ? const Center(child: CircularProgressIndicator())
           : data.isEmpty

@@ -156,6 +156,7 @@ Hormat saya,
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.title),
                       ),
+                      readOnly: true,
                       textCapitalization: TextCapitalization.words,
                       validator: (value) {
                         if (value == null || value.isEmpty) {

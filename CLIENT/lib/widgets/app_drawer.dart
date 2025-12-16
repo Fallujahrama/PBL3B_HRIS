@@ -1,48 +1,94 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+// --- IMPORT MODEL DAN SERVICE ---
+import '/features/login/models/user_logged_model.dart';
+import '/features/login/services/auth.service.dart'; // Digunakan untuk fungsi logout
+// -------------------------------
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Dapatkan warna primer dari tema
-    final primaryColor = Theme.of(context).colorScheme.primary;
+    // Dapatkan instance UserLoggedModel
+    final userModel = UserLoggedModel();
+    final user = userModel.currentUser;
+    final employee = userModel.employeeData;
+    
+    // Cek status dan role
+    final bool isLoggedIn = userModel.isLoggedIn;
+    // Role 1 = Admin, Role 0 = Employee
+    final bool isAdmin = user?.role == 1; 
 
-    // Data Pengguna (Placeholder)
-    const String userName = "John Doe";
-    // Ambil huruf pertama sebagai inisial
+    // Jika pengguna belum login, tampilkan drawer kosong atau kosongkan data
+    if (!isLoggedIn || user == null) {
+      // Jika ini terjadi, harusnya navigasi sudah diarahkan ke halaman login.
+      // Kita hanya menampilkan Drawer kosong atau yang sangat dasar.
+       return Drawer(
+          child: ListView(
+            children: [
+              DrawerHeader(
+                child: Center(child: Text("Silakan Login")),
+              ),
+              ListTile(
+                leading: const Icon(Icons.logout),
+                title: const Text('Login'),
+                onTap: () => context.go('/login'),
+              ),
+            ],
+          ),
+      );
+    }
+    
+    // Data Pengguna yang akan ditampilkan di Header
+    final String userName = user.name.isNotEmpty ? user.name : "Pengguna";
+    final String userRoleText = isAdmin ? "Administrator" : (employee?['position']?['name'] ?? 'Karyawan');
     final String initial = userName.isNotEmpty ? userName[0].toUpperCase() : '?';
     
+    final primaryColor = Theme.of(context).colorScheme.primary;
+
+    // Fungsi untuk Logout
+    Future<void> handleLogout() async {
+      context.pop(); // Tutup drawer
+      try {
+        await AuthService().logout(); // Panggil fungsi logout
+        context.go('/login'); // Arahkan ke halaman login
+      } catch (e) {
+        // Tampilkan error jika logout API gagal (meskipun data lokal sudah dihapus)
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Gagal logout: $e")),
+        );
+      }
+    }
+
+
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           // ==== MODERN DRAWER HEADER ====
           UserAccountsDrawerHeader(
-            accountName: const Text(
-              userName, // Placeholder Nama Pengguna
-              style: TextStyle(
+            accountName: Text(
+              userName, 
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),
             ),
-            accountEmail: const Text(
-              "HR Manager", // Placeholder Jabatan/Peran
-              style: TextStyle(
+            accountEmail: Text(
+              userRoleText, // Jabatan/Peran
+              style: const TextStyle(
                 fontSize: 14,
               ),
             ),
             currentAccountPicture: CircleAvatar(
-              // Latar belakang tetap menggunakan warna default
               backgroundColor: Colors.white.withOpacity(0.8),
-              // **MODIFIKASI: Mengganti Icon dengan Text (Inisial)**
               child: Text(
-                initial, // Menampilkan inisial nama (contoh: J)
+                initial, 
                 style: TextStyle(
-                  fontSize: 28, // Ukuran font disesuaikan
+                  fontSize: 28, 
                   fontWeight: FontWeight.bold,
-                  color: primaryColor, // Warna teks inisial menggunakan primaryColor
+                  color: primaryColor,
                 ),
               ),
             ),
@@ -60,72 +106,90 @@ class AppDrawer extends StatelessWidget {
           ),
           // ==== AKHIR MODERN DRAWER HEADER ====
 
-          // ==== HOME ====
-          ListTile(
-            leading: const Icon(Icons.home_outlined),
-            title: const Text("Home"),
-            onTap: () => context.go('/home'),
-          ),
+          // ==== MENU UMUM (SELALU ADA) ====
+          // ListTile(
+          //   leading: const Icon(Icons.home_outlined),
+          //   title: const Text("Home"),
+          //   onTap: () => context.go('/home'),
+          // ),
 
-          ListTile(
-            leading: const Icon(Icons.dashboard_outlined),
-            title: const Text('Dashboard'),
-            onTap: () => context.go('/employee-dashboard'),
-          ),
+          // ==== MENU UNTUK EMPLOYEE (ROLE 0) ====
+          if (!isAdmin) ...[
+             ListTile(
+              leading: const Icon(Icons.dashboard_outlined),
+              title: const Text('Dashboard'),
+              onTap: () => context.go('/employee-dashboard'), // Ganti rute jika perlu
+            ),
+          const Divider(),
+          
+            ListTile(
+              leading: const Icon(Icons.access_time_outlined),
+              title: const Text('Absensi'),
+              onTap: () => context.go('/attendance'),
+            ),
+             ListTile(
+              leading: const Icon(Icons.insert_chart_outlined),
+              title: const Text('Laporan Absensi'),
+              onTap: () => context.go('/employee/report'), // Laporan semua karyawan
+            ),
+            ListTile(
+              leading: const Icon(Icons.mail_outline),
+              title: const Text("Pengajuan Surat"),
+              onTap: () => context.go('/form-surat'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.money_outlined),
+              title: const Text('Gaji'),
+              onTap: () => context.go('/employee/salary'),
+            ),
+          ],
+          
 
-          ListTile(
-            leading: const Icon(Icons.person_outline),
-            title: const Text('Profile'),
-            onTap: () => context.go('/employee/profile'),
-          ),
-
-          ListTile(
-            leading: const Icon(Icons.access_time_outlined),
-            title: const Text('Absensi'),
-            onTap: () => context.go('/attendance'),
-          ),
-
+          // ==== MENU UNTUK ADMIN (ROLE 1) ====
+          if (isAdmin) ...[
+            ListTile(
+              leading: const Icon(Icons.dashboard_outlined),
+              title: const Text('Dashboard'),
+              onTap: () => context.go('/admin-dashboard'), // Ganti rute jika perlu
+            ),
           const Divider(),
 
-          // ==== POSITION (MASTER DATA) ====
-          ListTile(
-            leading: const Icon(Icons.storage_outlined),
-            title: const Text("Master Data"),
-            onTap: () => context.go('/master-data'),
-          ),
-
-          // ==== PENGAJUAN SURAT ====
-          ListTile(
-            leading: const Icon(Icons.mail_outline),
-            title: const Text("Pengajuan Surat"),
-            onTap: () => context.go('/letter-home'),
-          ),
-
-          ListTile(
-            leading: const Icon(Icons.money_outlined),
-            title: const Text('Gaji'),
-            onTap: () => context.go('/employee/salary'),
-          ),
-          ListTile(
-            leading: const Icon(Icons.insert_chart_outlined),
-            title: const Text('Laporan Absensi'),
-            onTap: () => context.go('/employee/report'),
-          ),
-
-          // ==== LAPORAN GAJI ====
-          ListTile(
-            leading: const Icon(Icons.article_outlined),
-            title: const Text("Laporan Gaji Karyawan"),
-            onTap: () => context.go('/summary-salary'),
-          ),
-
-          const Divider(),
+            ListTile(
+              leading: const Icon(Icons.storage_outlined),
+              title: const Text("Master Data"),
+              onTap: () => context.go('/master-data'),
+            ),
+           
+            ListTile(
+              leading: const Icon(Icons.article_outlined),
+              title: const Text("Laporan Gaji Karyawan"),
+              onTap: () => context.go('/summary-salary'),
+            ),
+            // Jika ada menu Approval/Persetujuan Admin
+            ListTile(
+              leading: const Icon(Icons.settings_outlined),
+              title: const Text("Kelola Template Surat"),
+              onTap: () => context.go('/letters'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.done_all_outlined),
+              title: const Text("Persetujuan Surat"),
+              onTap: () => context.go('/hrd-list'),
+            ),
+            // Jika ada menu Rekap Surat Karyawan
+            ListTile(
+              leading: const Icon(Icons.assessment),
+              title: const Text("Rekap Surat Karyawan"),
+              onTap: () => context.go('/employee-recap'),
+            ),
+            const Divider(),
+          ],
 
           // ==== LOGOUT ====
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),
-            onTap: () => context.go('/login'),
+            onTap: handleLogout,
           ),
         ],
       ),

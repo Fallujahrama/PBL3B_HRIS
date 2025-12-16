@@ -15,13 +15,13 @@ class EmployeeRecapDetailPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Detail ${employee.name}'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.download),
-            tooltip: 'Download PDF',
-            onPressed: () => _downloadPdf(context),
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.download),
+        //     tooltip: 'Download PDF',
+        //     onPressed: () => _downloadPdf(context),
+        //   ),
+        // ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -82,12 +82,12 @@ class EmployeeRecapDetailPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  _buildInfoRow(Icons.business, 'Departemen', employee.departement ?? '-'),
-                  const SizedBox(height: 8),
-                  _buildInfoRow(Icons.person, 'Gender', employee.gender ?? '-'),
-                  const SizedBox(height: 8),
-                  _buildInfoRow(Icons.calendar_today, 'Bergabung', employee.createdAt ?? '-'),
+                  // const SizedBox(height: 20),
+                  // _buildInfoRow(Icons.business, 'Departemen', employee.departement ?? '-'),
+                  // const SizedBox(height: 8),
+                  // _buildInfoRow(Icons.person, 'Gender', employee.gender ?? '-'),
+                  // const SizedBox(height: 8),
+                  // _buildInfoRow(Icons.calendar_today, 'Bergabung', employee.createdAt ?? '-'),
                 ],
               ),
             ),
@@ -246,30 +246,30 @@ class EmployeeRecapDetailPage extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.shade300,
-              blurRadius: 10,
-              offset: const Offset(0, -2),
-            ),
-          ],
-        ),
-        child: ElevatedButton.icon(
-          onPressed: () => _downloadPdf(context),
-          icon: const Icon(Icons.picture_as_pdf),
-          label: const Text('Download Laporan PDF'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red.shade700,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-        ),
-      ),
+      // bottomNavigationBar: Container(
+      //   padding: const EdgeInsets.all(16),
+      //   decoration: BoxDecoration(
+      //     color: Colors.white,
+      //     boxShadow: [
+      //       BoxShadow(
+      //         color: Colors.grey.shade300,
+      //         blurRadius: 10,
+      //         offset: const Offset(0, -2),
+      //       ),
+      //     ],
+      //   ),
+      //   child: ElevatedButton.icon(
+      //     onPressed: () => _downloadPdf(context),
+      //     icon: const Icon(Icons.picture_as_pdf),
+      //     label: const Text('Download Laporan PDF'),
+      //     style: ElevatedButton.styleFrom(
+      //       backgroundColor: Colors.red.shade700,
+      //       foregroundColor: Colors.white,
+      //       padding: const EdgeInsets.symmetric(vertical: 16),
+      //       textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      //     ),
+      //   ),
+      // ),
     );
   }
 

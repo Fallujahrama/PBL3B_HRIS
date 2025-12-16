@@ -31,6 +31,11 @@ import '../features/employee/screens/employee_salary_screen.dart';
 import '../features/employee/screens/employee_report_screen.dart';
 import '../features/employee/screens/employee_profile_screen.dart';
 import '../features/absensi/screens/attendance_screen.dart';
+import '../features/login/screens/login_screen.dart';
+import '../features/login/screens/forgot_password_page.dart';
+import '../features/dashboard/screens/landing_screen.dart';
+import '../features/dashboard/screens/admin_dashboard_screen.dart';
+import '../features/dashboard/screens/employee_dashboard_screen.dart';
 
 class AppRoutes {
   // 🔹 tambahkan konstanta nama route
@@ -145,10 +150,10 @@ class AppRoutes {
       // ============================
       // LETTER ROUTES
       // ============================
-      GoRoute(
-        path: letterHome,
-        builder: (context, state) => const LetterHomeScreen(),
-      ),
+      // GoRoute(
+      //   path: letterHome,
+      //   builder: (context, state) => const LetterHomeScreen(),
+      // ),
 
       // KARYAWAN ROUTES
       GoRoute(
@@ -218,7 +223,7 @@ class AppRoutes {
       // ======================
       GoRoute(
         path: '/admin-dashboard',
-        builder: (context, state) => const AdminDashboard(),
+        builder: (context, state) => const AdminDashboardScreen(),
       ),
 
       // ======================

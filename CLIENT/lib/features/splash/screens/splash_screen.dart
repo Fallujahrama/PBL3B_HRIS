@@ -20,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen> {
     // Mengubah durasi menjadi 3 detik agar tidak terlalu lama
     Timer(const Duration(seconds: _splashDuration), () {
       if (mounted) {
-        context.go('/home');
+        context.go('/landing');
       }
     });
   }

@@ -2,17 +2,19 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
+import '../models/user_logged_model.dart'; // <--- Importasi Model Singleton
 
 class AuthService {
-  final String baseUrl = "http://localhost:8000/api";
+  final String baseUrl = "http://127.0.0.1:8000/api";
 
   // =============================
   //            LOGIN
   // =============================
   Future<User> login(String email, String password) async {
-    final uri = Uri.parse("$baseUrl/auth/login");
+    final uri = Uri.parse("$baseUrl/auth/login"); // Tambahkan kembali URI
 
     try {
+      // Tambahkan kembali Panggilan HTTP
       final response = await http.post(
         uri,
         headers: {
@@ -24,7 +26,7 @@ class AuthService {
           "password": password,
         },
       );
-
+      
       final data = jsonDecode(response.body);
 
       if (response.statusCode != 200) {
@@ -32,18 +34,23 @@ class AuthService {
       }
 
       final token = data['token'] ?? "";
-      final userMap = data['user'] ?? {};
+      final userMap = data['user'] ?? {}; // userMap sekarang berisi 'employee'
 
       if (token.isEmpty) {
         throw Exception("Token kosong dari server");
       }
 
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('token', token);
-      await prefs.setString('userName', userMap['name'] ?? '');
-      await prefs.setString('userEmail', userMap['email'] ?? '');
+      // Pembuatan objek User akan otomatis menyimpan data employee di dalamnya
+      final loggedInUser = User.fromJson(userMap, token);
 
-      return User.fromJson(userMap, token);
+      // --- INTEGRASI USERLOGGEDMODEL ---
+      
+      // Simpan objek User yang sudah lengkap (termasuk employeeData) ke Singleton
+      UserLoggedModel().setLoggedInUser(loggedInUser);
+
+      // --- END INTEGRASI ---
+
+      return loggedInUser;
     } catch (e) {
       rethrow;
     }
@@ -79,10 +86,13 @@ class AuthService {
   //            LOGOUT
   // =============================
   Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
+    // Ambil token dari Singleton
+    final token = UserLoggedModel().currentUser?.token;
 
-    if (token == null) return;
+    if (token == null) {
+        await UserLoggedModel().clearUser(); 
+        return;
+    }
 
     final url = Uri.parse('$baseUrl/auth/logout');
 
@@ -94,8 +104,7 @@ class AuthService {
       },
     );
 
-    prefs.remove('token');
-    prefs.remove('userName');
-    prefs.remove('userEmail');
+    // Hapus data dari Singleton (Ini akan menghapus data di SharedPreferences)
+    await UserLoggedModel().clearUser(); 
   }
 }
