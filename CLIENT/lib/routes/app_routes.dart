@@ -59,6 +59,10 @@ class AppRoutes {
         builder: (context, state) => const SplashScreen(),
       ),
       GoRoute(
+      path: '/landing',
+      builder: (context, state) => const LandingScreen(),
+    ),
+      GoRoute(
         path: '/home',
         name: 'home',
         builder: (context, state) => const HomeScreen(),
@@ -200,7 +204,30 @@ class AppRoutes {
         builder: (context, state) => const EmployeeRecapPage(),
       ),
 
+       // ======================
+      // AUTH
+      // ======================
+      GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+      GoRoute(
+        path: '/forgot-password',
+        builder: (context, state) => const ForgotPasswordPage(),
+      ),
 
+      // ======================
+      // DASHBOARD ADMIN
+      // ======================
+      GoRoute(
+        path: '/admin-dashboard',
+        builder: (context, state) => const AdminDashboard(),
+      ),
+
+      // ======================
+      // DASHBOARD EMPLOYEE
+      // ======================
+      GoRoute(
+        path: '/employee-dashboard', 
+        builder: (context, state) => const EmployeeDashboardScreen(),
+      ),
   
 
       GoRoute(
