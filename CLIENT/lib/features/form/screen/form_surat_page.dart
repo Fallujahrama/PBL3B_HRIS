@@ -148,7 +148,7 @@ class _FormSuratPageState extends State<FormSuratPage> {
         );
 
         // Kembali ke home
-        context.go('/');
+        context.go('/letter-home');
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
