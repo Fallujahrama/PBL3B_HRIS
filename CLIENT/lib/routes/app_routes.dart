@@ -1,6 +1,8 @@
 import 'package:go_router/go_router.dart';
 import 'package:hris_3B/features/summary_salary/screens/summary_salary_screen.dart';
 // import 'package:tracer_study_test_api/features/summary_salary/screens/summary_salary_screen.dart';
+import '../features/schedule/screens/schedule_add_page.dart';
+import '../features/schedule/screens/schedule_page.dart';
 import '../features/splash/screens/splash_screen.dart';
 import '../features/home/screens/home_screen.dart';
 import '../features/employee/screens/employee_list_screen.dart';
@@ -210,10 +212,18 @@ class AppRoutes {
         path: '/employee/profile',
         builder: (context, state) => const ProfilePage(),
       ),
+
+
       // Attendance ROUTES
       GoRoute(
         path: '/attendance',
         builder: (context, state) => const AttendanceScreen(),
+      ),
+      // Schedule ROUTES
+      GoRoute(path: '/schedule', builder: (ctx, state) => const SchedulePage()),
+      GoRoute(
+        path: '/schedule/add',
+        builder: (ctx, state) => const ScheduleAddPage(),
       ),
     ],
   );
