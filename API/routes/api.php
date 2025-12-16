@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\EmployeeController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\Api\LetterFormatController;
 use App\Http\Controllers\Api\LetterController;
 use App\Http\Controllers\Api\DepartmentController;
@@ -14,6 +15,17 @@ use App\Http\Controllers\Api\LetterSubmissionController;
 use App\Http\Controllers\EmployeeDashboardController;
 use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\UserController;
+
+/*
+|--------------------------------------------------------------------------
+| AUTH ROUTES (JWT)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('auth')->group(function () {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
 
 Route::apiResource('departments', DepartmentController::class);
 

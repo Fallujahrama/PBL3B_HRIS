@@ -30,6 +30,14 @@ import '../features/employee/screens/employee_salary_screen.dart';
 import '../features/employee/screens/employee_report_screen.dart';
 import '../features/employee/screens/employee_profile_screen.dart';
 
+// Auth
+import '../features/login/screens/login_screen.dart';
+import '../features/login/screens/forgot_password_page.dart';
+
+// Dashboard
+import '../features/dashboard/screens/admin_dashboard_screen.dart';
+import '../features/dashboard/screens/employee_dashboard_screen.dart';
+import '../features/dashboard/screens/landing_screen.dart';
 
 class AppRoutes {
   // 🔹 tambahkan konstanta nama route
@@ -57,6 +65,10 @@ class AppRoutes {
         name: 'splash',
         builder: (context, state) => const SplashScreen(),
       ),
+      GoRoute(
+      path: '/landing',
+      builder: (context, state) => const LandingScreen(),
+    ),
       GoRoute(
         path: '/home',
         name: 'home',
@@ -194,7 +206,30 @@ class AppRoutes {
         builder: (context, state) => const EmployeeRecapPage(),
       ),
 
+       // ======================
+      // AUTH
+      // ======================
+      GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+      GoRoute(
+        path: '/forgot-password',
+        builder: (context, state) => const ForgotPasswordPage(),
+      ),
 
+      // ======================
+      // DASHBOARD ADMIN
+      // ======================
+      GoRoute(
+        path: '/admin-dashboard',
+        builder: (context, state) => const AdminDashboard(),
+      ),
+
+      // ======================
+      // DASHBOARD EMPLOYEE
+      // ======================
+      GoRoute(
+        path: '/employee-dashboard', 
+        builder: (context, state) => const EmployeeDashboardScreen(),
+      ),
   
 
       GoRoute(
