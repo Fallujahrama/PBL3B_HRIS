@@ -30,6 +30,10 @@ class _DepartmentMapPageState extends State<DepartmentMapPage> {
       drawer: const AppDrawer(),
       appBar: AppBar(
         title: const Text("Map Department"),
+        leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => context.go('/master-data'),
+        ),
       ),
       body: FutureBuilder<List<Department>>(
         future: _futureDepartments,

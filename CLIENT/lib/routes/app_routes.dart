@@ -17,6 +17,7 @@ import '../features/department/models/department.dart';
 import '../features/department/screens/department_map_page.dart';
 
 import '../features/home/screens/letter_home_screen.dart';
+import '../features/master-data/screens/master_data_screen.dart';
 import '../features/letter/screens/letter_list_screen.dart';
 import '../features/letter/screens/letter_create_screen.dart';
 import '../features/letter/screens/letter_detail_screen.dart';
@@ -29,15 +30,7 @@ import '../features/form/screen/hrd_detail_page.dart';
 import '../features/employee/screens/employee_salary_screen.dart';
 import '../features/employee/screens/employee_report_screen.dart';
 import '../features/employee/screens/employee_profile_screen.dart';
-
-// Auth
-import '../features/login/screens/login_screen.dart';
-import '../features/login/screens/forgot_password_page.dart';
-
-// Dashboard
-import '../features/dashboard/screens/admin_dashboard_screen.dart';
-import '../features/dashboard/screens/employee_dashboard_screen.dart';
-import '../features/dashboard/screens/landing_screen.dart';
+import '../features/absensi/screens/attendance_screen.dart';
 
 class AppRoutes {
   // 🔹 tambahkan konstanta nama route
@@ -73,6 +66,11 @@ class AppRoutes {
         path: '/home',
         name: 'home',
         builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: '/master-data',
+        name: 'master-data',
+        builder: (context, state) => const MasterDataScreen(),
       ),
       GoRoute(
         path: '/summary-salary',
@@ -245,7 +243,11 @@ class AppRoutes {
         path: '/employee/profile',
         builder: (context, state) => const ProfilePage(),
       ),
-      
+      // Attendance ROUTES
+      GoRoute(
+        path: '/attendance',
+        builder: (context, state) => const AttendanceScreen(),
+      ),
     ],
   );
 }
