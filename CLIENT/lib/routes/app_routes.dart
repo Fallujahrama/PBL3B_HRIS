@@ -29,7 +29,7 @@ import '../features/form/screen/hrd_detail_page.dart';
 import '../features/employee/screens/employee_salary_screen.dart';
 import '../features/employee/screens/employee_report_screen.dart';
 import '../features/employee/screens/employee_profile_screen.dart';
-
+import '../features/absensi/screens/attendance_screen.dart';
 
 class AppRoutes {
   // 🔹 tambahkan konstanta nama route
@@ -210,7 +210,11 @@ class AppRoutes {
         path: '/employee/profile',
         builder: (context, state) => const ProfilePage(),
       ),
-      
+      // Attendance ROUTES
+      GoRoute(
+        path: '/attendance',
+        builder: (context, state) => const AttendanceScreen(),
+      ),
     ],
   );
 }

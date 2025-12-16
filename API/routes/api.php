@@ -7,13 +7,14 @@ use App\Http\Controllers\Api\LetterController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\PositionController;
 use App\Http\Controllers\Api\SalaryReportController;
-use App\Models\Absensi;
-use App\Http\Controllers\AbsensiController;
-use App\Http\Controllers\Api\EmployeeRecapController;
+use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\LetterSubmissionController;
-use App\Http\Controllers\EmployeeDashboardController;
-use App\Http\Controllers\SalaryController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\Api\EmployeeRecapController;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\SalaryController;
+use App\Http\Controllers\Api\EmployeeDashboardController;
+use App\Http\Controllers\Api\AbsensiController;
+use App\Models\Absensi;
 
 Route::apiResource('departments', DepartmentController::class);
 
@@ -49,8 +50,8 @@ Route::get('/letters/{id}/download', [LetterController::class, 'download']);
 // LETTER SUBMISSION (Karyawan mengajukan surat)
 // ============================
 // Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/letter/employee', [LetterSubmissionController::class, 'employeeInfo']);
-    Route::post('/letters/submit', [LetterSubmissionController::class, 'submit']);
+Route::get('/letter/employee', [LetterSubmissionController::class, 'employeeInfo']);
+Route::post('/letters/submit', [LetterSubmissionController::class, 'submit']);
 // });
 
 // ============================
@@ -59,6 +60,16 @@ Route::get('/letters/{id}/download', [LetterController::class, 'download']);
 Route::get('/employee-recap', [EmployeeRecapController::class, 'index']);
 Route::get('/employee-recap/download', [EmployeeRecapController::class, 'download']);
 Route::get('/employee-recap/pdf', [EmployeeRecapController::class, 'downloadPdf']);
+
+// ============================
+// Absensi Routes
+// ============================
+// 1. Submit Attendance (clock_in / clock_out / overtime_start / overtime_end)
+Route::post('/attendance/submit', [AttendanceController::class, 'store']);
+// 2. Get Department Location (untuk inisialisasi frontend)
+Route::get('/department/location/{employeeId}', [AttendanceController::class, 'getDepartmentLocation']);
+// 3. Get Attendance History (untuk tampilkan riwayat)
+Route::get('/attendance/history/{employeeId}', [AttendanceController::class, 'getHistory']);
 
 Route::prefix('employee')->middleware('auth:api')->group(function () {
 

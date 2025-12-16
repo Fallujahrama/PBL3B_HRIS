@@ -97,6 +97,12 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Logout'),
             onTap: () => context.go('/login'),
           ),
+
+          ListTile(
+            leading: const Icon(Icons.logout),
+            title: const Text('Absensi'),
+            onTap: () => context.go('/attendance'),
+          ),
         ],
       ),
     );
