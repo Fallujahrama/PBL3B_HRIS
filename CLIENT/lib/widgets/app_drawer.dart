@@ -9,14 +9,19 @@ class AppDrawer extends StatelessWidget {
     // Dapatkan warna primer dari tema
     final primaryColor = Theme.of(context).colorScheme.primary;
 
+    // Data Pengguna (Placeholder)
+    const String userName = "John Doe";
+    // Ambil huruf pertama sebagai inisial
+    final String initial = userName.isNotEmpty ? userName[0].toUpperCase() : '?';
+    
     return Drawer(
       child: ListView(
-        padding: EdgeInsets.zero, // Hapus padding default ListView
+        padding: EdgeInsets.zero,
         children: [
           // ==== MODERN DRAWER HEADER ====
           UserAccountsDrawerHeader(
             accountName: const Text(
-              "John Doe", // Placeholder Nama Pengguna
+              userName, // Placeholder Nama Pengguna
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
@@ -29,25 +34,27 @@ class AppDrawer extends StatelessWidget {
               ),
             ),
             currentAccountPicture: CircleAvatar(
+              // Latar belakang tetap menggunakan warna default
               backgroundColor: Colors.white.withOpacity(0.8),
-              // Ikon/Gambar Profil Placeholder
-              child: Icon(
-                Icons.person,
-                size: 40,
-                color: primaryColor,
+              // **MODIFIKASI: Mengganti Icon dengan Text (Inisial)**
+              child: Text(
+                initial, // Menampilkan inisial nama (contoh: J)
+                style: TextStyle(
+                  fontSize: 28, // Ukuran font disesuaikan
+                  fontWeight: FontWeight.bold,
+                  color: primaryColor, // Warna teks inisial menggunakan primaryColor
+                ),
               ),
             ),
             decoration: BoxDecoration(
-              // Menggunakan gradien atau warna solid yang diperkaya
               gradient: LinearGradient(
                 colors: [primaryColor, primaryColor.withOpacity(0.8)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
             ),
-            // Tambahkan onTap untuk navigasi ke halaman profile
             onDetailsPressed: () {
-              context.pop(); // Tutup Drawer
+              context.pop(); 
               context.go('/employee/profile');
             },
           ),
@@ -55,7 +62,7 @@ class AppDrawer extends StatelessWidget {
 
           // ==== HOME ====
           ListTile(
-            leading: const Icon(Icons.home_outlined), // Ubah ikon menjadi outlined
+            leading: const Icon(Icons.home_outlined),
             title: const Text("Home"),
             onTap: () => context.go('/home'),
           ),
@@ -73,12 +80,12 @@ class AppDrawer extends StatelessWidget {
           ),
 
           ListTile(
-            leading: const Icon(Icons.access_time_outlined), // Ikon Absensi
+            leading: const Icon(Icons.access_time_outlined),
             title: const Text('Absensi'),
             onTap: () => context.go('/attendance'),
           ),
 
-          const Divider(), // Pemisah untuk kategori
+          const Divider(),
 
           // ==== POSITION (MASTER DATA) ====
           ListTile(
