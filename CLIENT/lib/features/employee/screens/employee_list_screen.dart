@@ -584,9 +584,13 @@ void dispose() {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Master Karyawan', style: TextStyle(color: Colors.black)),
+        title: const Text('Data Karyawan', style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.black),
+        leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => context.go('/master-data'),
+        ),
       ),
       drawer: const AppDrawer(),
       body: _buildBody(),

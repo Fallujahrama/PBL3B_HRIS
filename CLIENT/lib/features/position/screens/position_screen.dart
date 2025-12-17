@@ -110,18 +110,23 @@ class _PositionScreenState extends State<PositionScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: const Color(
           0xFFF5F6F8), 
       drawer: const AppDrawer(),
       appBar: AppBar(
         title: const Text(
-          "Master Posisi",
+          "Data Posisi",
           style: TextStyle(color: Colors.black),
         ),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         iconTheme: const IconThemeData(color: Colors.black), 
+        leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => context.go('/master-data'),
+        ),
       ),
       body: _buildBody(context),
 

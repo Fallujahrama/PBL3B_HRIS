@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Models\Letter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class LetterSubmissionController extends Controller
 {
@@ -16,11 +17,14 @@ class LetterSubmissionController extends Controller
     public function employeeInfo(Request $request)
     {
         try {
-            $user = $request->user();
 
+$user = session()->get('user_login');
+
+
+            dd($user);
             if (!$user) {
                 // Testing mode: ambil employee pertama
-                $employee = Employee::with(['position', 'department'])->first();
+                $employee = Employee::with(['position', 'department'])->where('user_id', $user->id)->first();
 
                 if (!$employee) {
                     return response()->json([
@@ -83,21 +87,24 @@ class LetterSubmissionController extends Controller
                 'letter_format_id' => 'required|exists:letter_formats,id',
                 'tanggal_mulai' => 'required|date',
                 'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
+                'user_id' => 'required',
             ]);
 
             // Get employee (dengan atau tanpa auth)
-            $user = $request->user();
+            // $user = $request->user();
 
-            if (!$user) {
+            // if (!$user) {
                 // Testing mode: pakai employee pertama
-                $employee = Employee::with(['position', 'department'])->first();
+                // $employee = Employee::with(['position', 'department'])->first();
+
+                $employee = Employee::with('position', 'department')->where('user_id', $request->user_id)->first();
                 Log::info('Using first employee for testing: ' . $employee->id);
-            } else {
-                $employee = Employee::with(['position', 'department'])
-                    ->where('user_id', $user->id)
-                    ->first();
-                Log::info('Using authenticated employee: ' . $employee->id);
-            }
+            // } else {
+            //     $employee = Employee::with(['position', 'department'])
+            //         ->where('user_id', $user->id)
+            //         ->first();
+            //     Log::info('Using authenticated employee: ' . $employee->id);
+            // }
 
             if (!$employee) {
                 return response()->json([
@@ -117,6 +124,7 @@ class LetterSubmissionController extends Controller
                 'tanggal_selesai' => $validated['tanggal_selesai'],
                 'status' => 'pending',
             ]);
+            
 
             Log::info('Letter created successfully', [
                 'id' => $letter->id,

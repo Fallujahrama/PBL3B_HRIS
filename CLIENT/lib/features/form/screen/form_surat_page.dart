@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hris_3B/widgets/app_drawer.dart';
 import '../../letter/controllers/letter_controller.dart';
 import '../../letter/models/letter_format.dart';
-import '../services/api_service.dart';
+import '../../login/models/user_logged_model.dart'; // Akses Singleton
+import '../../login/models/user_model.dart'; // Model User
+import '../services/api_service.dart'; // Digunakan di submitSurat
 
 class FormSuratPage extends StatefulWidget {
   const FormSuratPage({super.key});
@@ -39,18 +42,15 @@ class _FormSuratPageState extends State<FormSuratPage> {
     setState(() => isLoading = true);
 
     try {
-      final response = await ApiService.fetchProfile();
-
-      print("PROFILE RESPONSE => $response");
-
-      if (response == null || response is! Map) {
-        throw "Response profile tidak valid";
-      }
-
-      final employee = response['employee'];
+      // --- PENGAMBILAN DATA DARI USERLOGGEDMODEL ---
+      final userModel = UserLoggedModel();
+      final employee = userModel.employeeData; 
 
       if (employee == null) {
-        throw "Data employee tidak ditemukan";
+        if (!userModel.isLoggedIn) {
+             throw "Sesi hilang. Harap login kembali.";
+        }
+        throw "Data employee tidak ditemukan di sesi."; 
       }
 
       // Simpan ID
@@ -59,17 +59,21 @@ class _FormSuratPageState extends State<FormSuratPage> {
       departmentId = employee['department_id'];
 
       // Autofill input
-      namaController.text = 
-        "${employee['first_name'] ?? ''} ${employee['last_name'] ?? ''}".trim();
-      jabatanController.text = employee['position']?['name'] ?? '';
-      departemenController.text = employee['department']?['name'] ?? '';
+      final firstName = employee['first_name'] ?? '';
+      final lastName = employee['last_name'] ?? '';
+      namaController.text = "$firstName $lastName".trim();
 
-      // Load template surat
+      // Akses nested map untuk jabatan dan departemen
+      final positionName = employee['position']?['name'] ?? 'N/A';
+      final departmentName = employee['department']?['name'] ?? 'N/A';
+      
+      jabatanController.text = positionName;
+      departemenController.text = departmentName;
+
+      // Load template surat (Membutuhkan API Call)
       templateList = await letterController.fetchLetterFormats();
       print('✅ Templates loaded: ${templateList.length} items');
-      for (var t in templateList) {
-        print('  - ${t.id}: ${t.name}');
-      }
+      
     } catch (e) {
       print("ERROR initData(): $e");
 
@@ -82,7 +86,7 @@ class _FormSuratPageState extends State<FormSuratPage> {
 
     if (mounted) setState(() => isLoading = false);
   }
-
+  
   Future<void> pickTanggalMulai() async {
     final picked = await showDatePicker(
       context: context,
@@ -128,16 +132,25 @@ class _FormSuratPageState extends State<FormSuratPage> {
       return;
     }
 
+    if (employeeId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Data profil tidak lengkap. Coba relogin.')),
+      );
+      return;
+    }
+    
     final data = {
       'letter_format_id': selectedTemplate!.id,
-      'tanggal_mulai': tanggalMulai!.toIso8601String().split('T')[0],    // YYYY-MM-DD
-      'tanggal_selesai': tanggalSelesai!.toIso8601String().split('T')[0], // YYYY-MM-DD
+      'tanggal_mulai': tanggalMulai!.toIso8601String().split('T')[0],    
+      'tanggal_selesai': tanggalSelesai!.toIso8601String().split('T')[0], 
+      // Karena API Service sudah mengambil user_id dari ULM, 
+      // kita tidak perlu mengirimkannya di sini.
     };
 
     print('📤 Submitting letter data: $data');
 
     try {
-      final success = await ApiService.createPengajuanSurat(data);
+      final success = await ApiService.createPengajuanSurat(data); 
 
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -147,8 +160,8 @@ class _FormSuratPageState extends State<FormSuratPage> {
           ),
         );
 
-        // Kembali ke home
-        context.go('/');
+        // Arahkan ke dashboard employee
+        context.go('/employee-dashboard'); 
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -193,8 +206,30 @@ class _FormSuratPageState extends State<FormSuratPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Mengubah struktur untuk menggunakan Scaffold dengan AppBar
     return Scaffold(
+      appBar: AppBar(
+        // leading: Builder(
+        //   builder: (context) => IconButton(
+        //     icon: const Icon(Icons.menu),
+        //     onPressed: () => Scaffold.of(context).openDrawer(),
+        //   ),
+        // ),
+        title: const Text(
+          "Form Pengajuan Surat",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Color(0xff1e6ab3), // Warna yang sama dengan teks di body
+          ),
+        ),
+        backgroundColor: const Color(0xffd3e8ff), // Warna latar belakang AppBar
+        elevation: 0, // Hilangkan shadow AppBar
+        iconTheme: const IconThemeData(color: Color(0xff1e6ab3)), // Warna ikon menu
+      ),
+      drawer: const AppDrawer(),
       body: Container(
+        // Latar belakang gradasi dipindahkan ke Body Container
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xffe7f2ff), Color(0xffd3e8ff)],
@@ -209,25 +244,12 @@ class _FormSuratPageState extends State<FormSuratPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  IconButton(
-                    onPressed: () => context.go('/letter-home'),
-                    icon: const Icon(
-                      Icons.arrow_back,
-                      color: Color(0xff1e6ab3),
-                    ),
-                  ),
-
-                  const SizedBox(height: 5),
-
-                  const Text(
-                    "Form Pengajuan Surat",
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xff1e6ab3),
-                    ),
-                  ),
-                  const SizedBox(height: 25),
+                  
+                  // Hapus: IconButton back dan Judul (sudah ada di AppBar)
+                  // const SizedBox(height: 5),
+                  // const Text("Form Pengajuan Surat", ... ),
+                  
+                  const SizedBox(height: 10), // Sedikit jarak dari AppBar
 
                   if (isLoading)
                     const Center(child: CircularProgressIndicator())

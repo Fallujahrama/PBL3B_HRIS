@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hris_3B/widgets/app_drawer.dart';
 import '../../../theme/app_theme.dart';
 import '../controllers/letter_controller.dart';
 import '../models/letter_format.dart';
@@ -111,10 +112,10 @@ class _LettersListScreenState extends State<LettersListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/letter-home'),
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back),
+        //   onPressed: () => context.go('/admin-dashboard'),
+        // ),
         title: const Text("Kelola Template Surat"),
         actions: [
           IconButton(
@@ -123,6 +124,7 @@ class _LettersListScreenState extends State<LettersListScreen> {
           ),
         ],
       ),
+      drawer: const AppDrawer(),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : formats.isEmpty
@@ -141,15 +143,15 @@ class _LettersListScreenState extends State<LettersListScreen> {
                         style: TextStyle(color: AppTheme.textGrey),
                       ),
                       const SizedBox(height: 16),
-                      ElevatedButton.icon(
-                        onPressed: () => context.push('/letter/template/create'),
-                        icon: const Icon(Icons.add),
-                        label: const Text('Buat Template Baru'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.primaryBlue,
-                          foregroundColor: Colors.white,
-                        ),
-                      ),
+                      // ElevatedButton.icon(
+                      //   onPressed: () => context.push('/letter/template/create'),
+                      //   icon: const Icon(Icons.add),
+                      //   label: const Text('Buat Template Baru'),
+                      //   style: ElevatedButton.styleFrom(
+                      //     backgroundColor: AppTheme.primaryBlue,
+                      //     foregroundColor: Colors.white,
+                      //   ),
+                      // ),
                     ],
                   ),
                 )
@@ -236,16 +238,16 @@ class _LettersListScreenState extends State<LettersListScreen> {
                     );
                   },
                 ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          final result = await context.push('/letter/template/create');
-          if (result == true) loadData();
-        },
-        backgroundColor: AppTheme.primaryBlue,
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.add),
-        label: const Text('Buat Template'),
-      ),
+      // floatingActionButton: FloatingActionButton.extended(
+      //   onPressed: () async {
+      //     final result = await context.push('/letter/template/create');
+      //     if (result == true) loadData();
+      //   },
+      //   backgroundColor: AppTheme.primaryBlue,
+      //   foregroundColor: Colors.white,
+      //   icon: const Icon(Icons.add),
+      //   label: const Text('Buat Template'),
+      // ),
     );
   }
 }

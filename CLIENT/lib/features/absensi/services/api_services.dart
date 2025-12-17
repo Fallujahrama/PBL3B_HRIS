@@ -6,7 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class ApiService {
   // Ubah sesuai URL backend Anda
   static final String baseUrl = dotenv.env['BASE_URL'] ?? 'http://127.0.0.1:8000/api';
-  // Untuk testing lokal: http://localhost:8000/api
+  // Untuk testing lokal: http://127.0.0.1:8000/api
   // Untuk device: http://{IP_KOMPUTER}:8000/api
 
   static Map<String, String> _getHeaders() {

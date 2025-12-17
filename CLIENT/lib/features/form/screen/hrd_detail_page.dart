@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
+import 'package:universal_html/html.dart' as html;
 import '../services/api_service.dart';
 
 class HrdDetailPage extends StatelessWidget {
@@ -106,59 +104,47 @@ class HrdDetailPage extends StatelessWidget {
 
       final pdfBytes = await ApiService.downloadPdf(surat['id']);
 
-      if (pdfBytes != null) {
+      if (pdfBytes != null && context.mounted) {
         print('✅ PDF bytes received: ${pdfBytes.length}');
 
-        final fileName = 'surat_${surat['name']}_${surat['id']}.pdf'
-            .replaceAll(' ', '_')
-            .toLowerCase();
+        // Generate file name
+        final fileName = 'surat_${surat['id']}_${DateTime.now().millisecondsSinceEpoch}.pdf';
         
-        print('💾 Saving as: $fileName');
+        print('💾 Downloading as: $fileName');
 
-        final directory = Platform.isAndroid
-            ? Directory('/storage/emulated/0/Download')
-            : await getApplicationDocumentsDirectory();
+        // Create blob and trigger download
+        final blob = html.Blob([pdfBytes], 'application/pdf');
+        final url = html.Url.createObjectUrlFromBlob(blob);
+        final anchor = html.document.createElement('a') as html.AnchorElement
+          ..href = url
+          ..style.display = 'none'
+          ..download = fileName;
+        
+        html.document.body?.append(anchor);
+        anchor.click();
+        html.Url.revokeObjectUrl(url);
+        anchor.remove();
 
-        final file = File('${directory.path}/$fileName');
-        await file.writeAsBytes(pdfBytes);
-
-        print('✅ File saved to: ${file.path}');
+        print('✅ PDF downloaded successfully: ${pdfBytes.length} bytes');
 
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('✅ PDF tersimpan di: ${file.path}'),
+              content: Text('✅ PDF berhasil diunduh: $fileName'),
               backgroundColor: Colors.green,
-              duration: const Duration(seconds: 5),
-              action: SnackBarAction(
-                label: 'Buka',
-                textColor: Colors.white,
-                onPressed: () async {
-                  try {
-                    final uri = Uri.file(file.path);
-                    if (await canLaunchUrl(uri)) {
-                      await launchUrl(uri, mode: LaunchMode.externalApplication);
-                    }
-                  } catch (e) {
-                    print('Error opening PDF: $e');
-                  }
-                },
-              ),
+              duration: const Duration(seconds: 3),
             ),
           );
         }
-      } else {
+      } else if (context.mounted) {
         print('❌ PDF bytes is null');
-        
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('❌ Gagal mengunduh PDF. File mungkin belum tersedia.'),
-              backgroundColor: Colors.red,
-              duration: Duration(seconds: 3),
-            ),
-          );
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('❌ Gagal mengunduh PDF. File mungkin belum tersedia.'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 3),
+          ),
+        );
       }
     } catch (e, stackTrace) {
       print('❌ Download error: $e');
@@ -269,23 +255,24 @@ class HrdDetailPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  if (status == 'approved')
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: () => downloadPdf(context),
-                          icon: const Icon(Icons.download),
-                          label: const Text('Download PDF'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                        ),
-                      ),
-                    ),
+                  
+                  // if (status == 'approved')
+                  //   Padding(
+                  //     padding: const EdgeInsets.only(top: 16),
+                  //     child: SizedBox(
+                  //       width: double.infinity,
+                  //       child: ElevatedButton.icon(
+                  //         onPressed: () => downloadPdf(context),
+                  //         icon: const Icon(Icons.download),
+                  //         label: const Text('Download PDF'),
+                  //         style: ElevatedButton.styleFrom(
+                  //           backgroundColor: Colors.blue,
+                  //           foregroundColor: Colors.white,
+                  //           padding: const EdgeInsets.symmetric(vertical: 12),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
                 ],
               ),
           ],

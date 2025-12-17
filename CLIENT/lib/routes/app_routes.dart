@@ -19,6 +19,7 @@ import '../features/department/models/department.dart';
 import '../features/department/screens/department_map_page.dart';
 
 import '../features/home/screens/letter_home_screen.dart';
+import '../features/master-data/screens/master_data_screen.dart';
 import '../features/letter/screens/letter_list_screen.dart';
 import '../features/letter/screens/letter_create_screen.dart';
 import '../features/letter/screens/letter_detail_screen.dart';
@@ -32,6 +33,11 @@ import '../features/employee/screens/employee_salary_screen.dart';
 import '../features/employee/screens/employee_report_screen.dart';
 import '../features/employee/screens/employee_profile_screen.dart';
 import '../features/absensi/screens/attendance_screen.dart';
+import '../features/login/screens/login_screen.dart';
+import '../features/login/screens/forgot_password_page.dart';
+import '../features/dashboard/screens/landing_screen.dart';
+import '../features/dashboard/screens/admin_dashboard_screen.dart';
+import '../features/dashboard/screens/employee_dashboard_screen.dart';
 
 class AppRoutes {
   // 🔹 tambahkan konstanta nama route
@@ -60,9 +66,18 @@ class AppRoutes {
         builder: (context, state) => const SplashScreen(),
       ),
       GoRoute(
+      path: '/landing',
+      builder: (context, state) => const LandingScreen(),
+    ),
+      GoRoute(
         path: '/home',
         name: 'home',
         builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: '/master-data',
+        name: 'master-data',
+        builder: (context, state) => const MasterDataScreen(),
       ),
       GoRoute(
         path: '/summary-salary',
@@ -137,10 +152,10 @@ class AppRoutes {
       // ============================
       // LETTER ROUTES
       // ============================
-      GoRoute(
-        path: letterHome,
-        builder: (context, state) => const LetterHomeScreen(),
-      ),
+      // GoRoute(
+      //   path: letterHome,
+      //   builder: (context, state) => const LetterHomeScreen(),
+      // ),
 
       // KARYAWAN ROUTES
       GoRoute(
@@ -196,7 +211,30 @@ class AppRoutes {
         builder: (context, state) => const EmployeeRecapPage(),
       ),
 
+       // ======================
+      // AUTH
+      // ======================
+      GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+      GoRoute(
+        path: '/forgot-password',
+        builder: (context, state) => const ForgotPasswordPage(),
+      ),
 
+      // ======================
+      // DASHBOARD ADMIN
+      // ======================
+      GoRoute(
+        path: '/admin-dashboard',
+        builder: (context, state) => const AdminDashboardScreen(),
+      ),
+
+      // ======================
+      // DASHBOARD EMPLOYEE
+      // ======================
+      GoRoute(
+        path: '/employee-dashboard', 
+        builder: (context, state) => const EmployeeDashboardScreen(),
+      ),
   
 
       GoRoute(

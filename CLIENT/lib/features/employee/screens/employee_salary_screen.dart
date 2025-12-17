@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:hris_3B/widgets/app_drawer.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
@@ -89,10 +90,10 @@ class _EmployeeSalaryScreenState extends State<EmployeeSalaryScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/employee-dashboard'),
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back),
+        //   onPressed: () => context.go('/employee-dashboard'),
+        // ),
         title: const Text("Slip Gaji Karyawan", style: TextStyle(color: Colors.white)),
         backgroundColor: const Color(0xFF4A6FA5),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -103,6 +104,7 @@ class _EmployeeSalaryScreenState extends State<EmployeeSalaryScreen> {
           )
         ],
       ),
+      drawer: const AppDrawer(),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : salaryData == null

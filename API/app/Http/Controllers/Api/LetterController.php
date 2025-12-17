@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class LetterController extends Controller
 {
@@ -58,7 +59,9 @@ class LetterController extends Controller
             $letter->status = $request->status;
 
             // ✅ Generate PDF saat approve (KEMBALIKAN SEPERTI KEMARIN)
-            if ($request->status === 'approved') {
+            if ($request->status == 'approved') {
+
+
                 $data = [
                     'name' => $letter->name,
                     'jabatan' => $letter->jabatan,
@@ -67,6 +70,43 @@ class LetterController extends Controller
                     'tanggal_mulai' => $letter->tanggal_mulai,
                     'tanggal_selesai' => $letter->tanggal_selesai,
                 ];
+
+                $statusCheckClock = [
+                    2 => 'sakit',
+                    3 => 'cuti',
+                    4 => 'dinas',
+                ];
+
+                $currentStatus = '';
+
+                if (array_key_exists($letter->letter_format_id, $statusCheckClock)) {
+                    $currentStatus = $statusCheckClock[$letter->letter_format_id];
+                }
+
+                $dataCheckClock = [
+                    'employee_id' => $letter->employee_id,
+                    'check_clock_type' => 0,
+                    'status' => $currentStatus,
+                    'clock_in' => '08:00:00',
+                    'clock_out' => '16:00:00',
+                ];
+
+
+                $startDate = Carbon::parse($letter->tanggal_mulai);
+                $endDate = Carbon::parse($letter->tanggal_selesai);
+
+                $daysInPeriod = $startDate->diffInDays($endDate) + 1;
+
+                for ($i = 0; $i < $daysInPeriod; $i++) {
+
+                    $currentDate = $startDate->copy()->addDays($i);
+
+                    $dataToInsert = $dataCheckClock;
+
+                    $dataToInsert['date'] = $currentDate->format('Y-m-d');
+
+                    \App\Models\CheckClock::create($dataToInsert);
+}
 
                 $pdf = Pdf::loadView('letters.template', $data);
 
@@ -101,7 +141,7 @@ class LetterController extends Controller
         }
     }
 
-    // ✅ FIX: Download dengan file_get_contents (sama seperti kode Rizky)
+    // Download PDF
     public function download($id)
     {
         try {
@@ -114,17 +154,25 @@ class LetterController extends Controller
                 ], 404);
             }
 
-            // ✅ FIX: Ambil dari disk 'public'
+            // ✅ pdf_path sudah berisi 'letters/surat_x_timestamp.pdf'
+            // Langsung gunakan storage_path
             $fullPath = storage_path('app/public/' . $letter->pdf_path);
+            
+            Log::info('Download PDF attempt', [
+                'letter_id' => $id,
+                'pdf_path' => $letter->pdf_path,
+                'full_path' => $fullPath,
+                'exists' => file_exists($fullPath)
+            ]);
 
             if (!file_exists($fullPath)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'File not found: ' . $letter->pdf_path
+                    'message' => 'File not found: ' . $fullPath
                 ], 404);
             }
 
-            return response()->file($fullPath);
+            return response()->download($fullPath);
 
         } catch (\Exception $e) {
             Log::error('Download PDF error: ' . $e->getMessage());

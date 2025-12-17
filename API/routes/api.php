@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\EmployeeController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\LetterFormatController;
 use App\Http\Controllers\Api\LetterController;
 use App\Http\Controllers\Api\DepartmentController;
@@ -16,6 +17,25 @@ use App\Http\Controllers\Api\EmployeeDashboardController;
 use App\Http\Controllers\Api\AbsensiController;
 use App\Http\Controllers\Api\ScheduleController;
 use App\Models\Absensi;
+use App\Http\Controllers\Api\AdminController;
+
+Route::prefix('admin')
+    ->middleware('auth:api')
+    ->group(function () {
+
+        Route::get('/dashboard/stats', [AdminController::class, 'stats']);
+
+});
+/*
+|--------------------------------------------------------------------------
+| AUTH ROUTES (JWT)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('auth')->group(function () {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
 
 Route::apiResource('departments', DepartmentController::class);
 
@@ -72,7 +92,9 @@ Route::get('/department/location/{employeeId}', [AttendanceController::class, 'g
 // 3. Get Attendance History (untuk tampilkan riwayat)
 Route::get('/attendance/history/{employeeId}', [AttendanceController::class, 'getHistory']);
 
-Route::prefix('employee')->middleware('auth:api')->group(function () {
+Route::prefix('employee')
+->middleware('auth:api')
+->group(function () {
 
     // Dashboard & Attendance
     Route::get('/dashboard/summary', [EmployeeDashboardController::class, 'getDashboardSummary']);
