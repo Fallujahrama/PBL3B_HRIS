@@ -6,7 +6,7 @@ import '../models/summary_salary.dart';
 import '../widgets/bar_chart_widget.dart';
 import '../widgets/summary_kpi_card.dart';
 import '../widgets/total_salary_card.dart';
-import '../../../widgets/app_drawer.dart';
+import '../../../../widgets/app_drawer.dart';
 
 class SummarySalaryScreen extends StatefulWidget {
   const SummarySalaryScreen({super.key});

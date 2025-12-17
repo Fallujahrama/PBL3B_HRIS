@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:universal_html/html.dart' as html;
+import 'dart:io';
+import 'package:path_provider/path_provider.dart'; 
 import '../services/api_service.dart';
 
 class HrdDetailPage extends StatelessWidget {
@@ -107,34 +109,69 @@ class HrdDetailPage extends StatelessWidget {
       if (pdfBytes != null && context.mounted) {
         print('✅ PDF bytes received: ${pdfBytes.length}');
 
-        // Generate file name
         final fileName = 'surat_${surat['id']}_${DateTime.now().millisecondsSinceEpoch}.pdf';
-        
-        print('💾 Downloading as: $fileName');
 
-        // Create blob and trigger download
-        final blob = html.Blob([pdfBytes], 'application/pdf');
-        final url = html.Url.createObjectUrlFromBlob(blob);
-        final anchor = html.document.createElement('a') as html.AnchorElement
-          ..href = url
-          ..style.display = 'none'
-          ..download = fileName;
-        
-        html.document.body?.append(anchor);
-        anchor.click();
-        html.Url.revokeObjectUrl(url);
-        anchor.remove();
+        if (kIsWeb) {
+          print('💾 Downloading for WEB: $fileName');
 
-        print('✅ PDF downloaded successfully: ${pdfBytes.length} bytes');
+          final blob = html.Blob([pdfBytes], 'application/pdf');
+          final url = html.Url.createObjectUrlFromBlob(blob);
+          final anchor = html.document.createElement('a') as html.AnchorElement
+            ..href = url
+            ..style.display = 'none'
+            ..download = fileName;
+          
+          html.document.body?.append(anchor);
+          anchor.click();
+          html.Url.revokeObjectUrl(url);
+          anchor.remove();
 
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('✅ PDF berhasil diunduh: $fileName'),
-              backgroundColor: Colors.green,
-              duration: const Duration(seconds: 3),
-            ),
-          );
+          print('✅ PDF downloaded via browser');
+
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('✅ PDF berhasil diunduh: $fileName'),
+                backgroundColor: Colors.green,
+                duration: const Duration(seconds: 3),
+              ),
+            );
+          }
+        } else {
+          print('💾 Saving for MOBILE: $fileName');
+
+          // Get download directory
+          Directory directory;
+          if (Platform.isAndroid) {
+            // Android: Save to Downloads folder
+            directory = Directory('/storage/emulated/0/Download');
+            if (!await directory.exists()) {
+              directory = Directory('/storage/emulated/0/Downloads');
+            }
+          } else {
+            // iOS: Save to app documents directory
+            directory = await getApplicationDocumentsDirectory();
+          }
+
+          final file = File('${directory.path}/$fileName');
+          await file.writeAsBytes(pdfBytes);
+
+          print('✅ PDF saved to: ${file.path}');
+
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('✅ PDF tersimpan di:\n${file.path}'),
+                backgroundColor: Colors.green,
+                duration: const Duration(seconds: 5),
+                action: SnackBarAction(
+                  label: 'OK',
+                  textColor: Colors.white,
+                  onPressed: () {},
+                ),
+              ),
+            );
+          }
         }
       } else if (context.mounted) {
         print('❌ PDF bytes is null');
@@ -255,24 +292,24 @@ class HrdDetailPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
-                  // if (status == 'approved')
-                  //   Padding(
-                  //     padding: const EdgeInsets.only(top: 16),
-                  //     child: SizedBox(
-                  //       width: double.infinity,
-                  //       child: ElevatedButton.icon(
-                  //         onPressed: () => downloadPdf(context),
-                  //         icon: const Icon(Icons.download),
-                  //         label: const Text('Download PDF'),
-                  //         style: ElevatedButton.styleFrom(
-                  //           backgroundColor: Colors.blue,
-                  //           foregroundColor: Colors.white,
-                  //           padding: const EdgeInsets.symmetric(vertical: 12),
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ),
+
+                  if (status == 'approved')
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () => downloadPdf(context),
+                          icon: const Icon(Icons.download),
+                          label: const Text('Download PDF'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
           ],
