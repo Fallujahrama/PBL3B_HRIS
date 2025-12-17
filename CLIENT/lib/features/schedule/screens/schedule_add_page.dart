@@ -69,12 +69,18 @@ class _ScheduleAddPageState extends State<ScheduleAddPage> {
       if (!mounted) return;
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Hari libur berhasil ditambahkan')),
+          const SnackBar(
+            content: Text('Hari libur berhasil ditambahkan'),
+            backgroundColor: Colors.green,
+          ),
         );
         Navigator.of(context).pop(true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Gagal menambahkan hari libur')),
+          const SnackBar(
+            content: Text('Gagal menambahkan hari libur'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } catch (e, st) {
@@ -82,7 +88,12 @@ class _ScheduleAddPageState extends State<ScheduleAddPage> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Terjadi error: $e')));
+        ).showSnackBar(
+          SnackBar(
+            content: Text('Terjadi error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
@@ -96,23 +107,39 @@ class _ScheduleAddPageState extends State<ScheduleAddPage> {
         : DateFormat('dd MMMM yyyy', 'id_ID').format(_selectedDate!);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Tambah Hari Libur')),
+      appBar: AppBar(
+        // ✅ Tombol back otomatis muncul karena Navigator stack
+        title: const Text('Tambah Hari Libur'),
+        // ✅ Atau bisa custom leading jika ingin styling khusus
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back),
+        //   onPressed: () => Navigator.of(context).pop(),
+        // ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const Text(
+                'Isi form di bawah untuk menambah hari libur baru',
+                style: TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(
                   labelText: 'Nama Hari Libur',
                   border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.event_note),
+                  hintText: 'Contoh: Hari Raya Idul Fitri',
                 ),
                 validator: (v) =>
                     (v == null || v.trim().isEmpty) ? 'Nama wajib diisi' : null,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
@@ -120,26 +147,53 @@ class _ScheduleAddPageState extends State<ScheduleAddPage> {
                       icon: const Icon(Icons.calendar_today),
                       label: Text(dateLabel),
                       onPressed: _pickDate,
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isSubmitting ? null : _submit,
-                  child: _isSubmitting
-                      ? const SizedBox(
-                          height: 18,
-                          width: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text('Simpan'),
-                ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  // ✅ Tombol Batal
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: _isSubmitting
+                          ? null
+                          : () => Navigator.of(context).pop(),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Text('Batal'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  // ✅ Tombol Simpan
+                  Expanded(
+                    flex: 2,
+                    child: ElevatedButton(
+                      onPressed: _isSubmitting ? null : _submit,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: _isSubmitting
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text(
+                              'Simpan',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

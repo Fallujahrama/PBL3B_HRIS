@@ -114,10 +114,13 @@ class AppDrawer extends StatelessWidget {
                 end: Alignment.bottomRight,
               ),
             ),
-            onDetailsPressed: () {
-              Navigator.of(context).pop();
-              context.go('/employee/profile');
-            },
+            // ✅ HANYA EMPLOYEE YANG BISA KLIK PROFILE
+            onDetailsPressed: !isAdmin 
+                ? () {
+                    Navigator.of(context).pop();
+                    context.go('/employee/profile');
+                  }
+                : null, // ✅ Null = tidak bisa diklik untuk admin
           ),
           // ==== AKHIR MODERN DRAWER HEADER ====
 
@@ -165,11 +168,11 @@ class AppDrawer extends StatelessWidget {
                 context.go('/employee/salary');
               },
             ),
-          ],
+          ]
           
 
           // ==== MENU UNTUK ADMIN (ROLE 1) ====
-          if (isAdmin) ...[
+          else if (isAdmin) ...[
             ListTile(
               leading: const Icon(Icons.dashboard_outlined),
               title: const Text('Dashboard'),
@@ -224,12 +227,18 @@ class AppDrawer extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.calendar_today),
               title: const Text("Jadwal Hari Libur"),
-              onTap: () => context.go('/schedule'),
+              onTap: () {
+                Navigator.of(context).pop();
+                context.go('/schedule');
+              },
             ),
             ListTile(
               leading: const Icon(Icons.assignment),
               title: const Text("Rekap Absensi"),
-              onTap: () => context.go('/attendance_report_page'),
+              onTap: () {
+                Navigator.of(context).pop();
+                context.go('/attendance_report_page');
+              },
             ),
             const Divider(),
           ],

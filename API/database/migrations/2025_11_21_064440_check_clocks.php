@@ -14,16 +14,16 @@ return new class extends Migration
         Schema::create('check_clocks', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('employee_id');
-            
+
             // 0 = Reguler, 1 = Lembur
             $table->boolean('check_clock_type');
-            
+
             // Status kehadiran
             $table->enum('status', ['hadir', 'sakit', 'dinas', 'cuti'])->default('hadir');
 
             $table->timestamp('date');
-            $table->time('clock_in');
-            $table->time('clock_out');
+            $table->time('clock_in')->nullable();
+            $table->time('clock_out')->nullable();
             $table->time('overtime_start')->nullable();
             $table->time('overtime_end')->nullable();
 

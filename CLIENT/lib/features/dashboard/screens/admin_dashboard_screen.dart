@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:hris_3B/widgets/app_drawer.dart'; // <--- Tambahkan import AppDrawer
-
+import 'package:hris_3B/widgets/app_drawer.dart';
 import '../../login/services/AdminDashboardService.dart';
+import '../../login/models/user_logged_model.dart'; // ✅ Import UserLoggedModel
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -46,13 +45,16 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     if (mounted) setState(() => loading = false);
   }
 
+  // ✅ PERBAIKAN: Gunakan UserLoggedModel
   Future<void> _loadProfile() async {
-    final prefs = await SharedPreferences.getInstance();
-    // Gunakan UserLoggedModel di masa depan untuk data yang lebih reliable
-    if (mounted) {
+    final userModel = UserLoggedModel();
+    final user = userModel.currentUser;
+    
+    if (user != null && mounted) {
       setState(() {
-        adminName = prefs.getString('userName') ?? '-';
-        adminEmail = prefs.getString('userEmail') ?? '-';
+        adminName = user.name.isNotEmpty ? user.name : 'Admin';
+        adminEmail = user.email.isNotEmpty ? user.email : '-';
+        adminRole = user.role == 1 ? 'Administrator' : 'Admin';
       });
     }
   }
@@ -82,13 +84,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     }
   }
 
-  // Fungsi logout dihapus dari sini karena akan ditangani oleh AppDrawer
-  /* Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    if (mounted) context.go('/login');
-  } */
-
   @override
   Widget build(BuildContext context) {
     const Color primaryColor = Color(0xff5478ad);
@@ -96,14 +91,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
     return Scaffold(
       backgroundColor: bgColor,
-      // === Tambahkan AppDrawer ===
       drawer: const AppDrawer(),
-      // ============================
-      
-      // === Tambahkan AppBar ===
       appBar: AppBar(
         title: Text(
-          'Halo, ${adminName.split(' ')[0]}!',
+          'Halo, ${adminName.split(' ')[0]}!', // ✅ Akan menampilkan nama dari UserLoggedModel
           style: const TextStyle(
             fontWeight: FontWeight.bold,
           ),
@@ -111,28 +102,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
         elevation: 0,
-        // Hapus tombol logout dari header, gunakan drawer
-        /* actions: [
-          IconButton(
-            icon: const Icon(Icons.logout_rounded, color: Colors.white),
-            onPressed: logout,
-            tooltip: 'Keluar',
-          ),
-        ], */
       ),
-      // ============================
-
       body: loading
           ? const Center(child: CircularProgressIndicator(color: primaryColor))
-          : SingleChildScrollView( // Bungkus konten di SingleChildScrollView
+          : SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Hapus _buildModernHeader
-                  
-                  // Bagian profil yang kini langsung berada di body
                   _buildProfileSection(primaryColor), 
                   const SizedBox(height: 24),
                   const Text(
@@ -165,11 +143,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-  // Fungsi _buildModernHeader sudah tidak diperlukan dan bisa dihapus/dilewati.
-  /* Widget _buildModernHeader(Color primaryColor) {
-     // ...
-  } */
-
   Widget _buildProfileSection(Color primaryColor) {
     return Container(
       decoration: BoxDecoration(
@@ -189,7 +162,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             radius: 30,
             backgroundColor: primaryColor.withOpacity(0.1),
             child: Text(
-              adminName.isNotEmpty ? adminName[0].toUpperCase() : '?',
+              adminName.isNotEmpty ? adminName[0].toUpperCase() : 'A',
               style: TextStyle(
                   color: primaryColor,
                   fontSize: 24,
@@ -233,7 +206,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   }
 
   Widget _buildSummaryCards(Color primaryColor) {
-    // Gunakan warna hardcode untuk icon jika perlu, atau pakai primaryColor
     return Row(
       children: [
         _summaryCard('Total Karyawan', '$totalEmployees', Icons.people_outline,
@@ -305,7 +277,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       ),
       child: Column(
         children: [
-          // Header Chart
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -333,7 +304,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ),
             )
           else
-            // Pie Chart dan Legend
             Column(
               children: [
                 SizedBox(
@@ -362,7 +332,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                // Legend di bawah chart
                 Wrap(
                   spacing: 16,
                   runSpacing: 10,
@@ -422,7 +391,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   }
 
   Widget _chartLegend(String title, int value, Color color) {
-    // Legend sederhana tanpa Spacer agar tidak error di layout sempit
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [

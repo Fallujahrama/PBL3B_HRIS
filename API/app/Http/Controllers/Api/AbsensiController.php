@@ -36,7 +36,7 @@ class AbsensiController extends Controller
         }
 
         // Order by 'date'
-        $data = $query->orderBy('date', 'asc')->get();
+        $data = $query->orderBy('date', 'desc')->get();
 
         return response()->json([
             'success' => true,

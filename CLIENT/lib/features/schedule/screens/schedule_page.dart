@@ -4,6 +4,7 @@ import '../widgets/schedule_calender_widget.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import '../services/schedule_service.dart';
 import '../../../theme/app_theme.dart';
+import '../../../widgets/app_drawer.dart'; // ✅ Tambahkan import drawer
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 class SchedulePage extends StatefulWidget {
@@ -106,12 +107,15 @@ class _SchedulePageState extends State<SchedulePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // ✅ Tambahkan drawer untuk admin
+      drawer: const AppDrawer(),
       appBar: AppBar(
         title: const Text('Hari Libur Nasional'),
         actions: [
           IconButton(
             icon: const Icon(Icons.sync),
             onPressed: _syncNationalHolidays,
+            tooltip: 'Sinkronisasi Hari Libur Nasional',
           ),
         ],
       ),
@@ -147,6 +151,7 @@ class _SchedulePageState extends State<SchedulePage> {
           if (result == true) loadAll();
         },
         child: const Icon(Icons.add),
+        tooltip: 'Tambah Hari Libur',
       ),
     );
   }
@@ -167,31 +172,81 @@ class _SchedulePageState extends State<SchedulePage> {
     return Container(
       padding: const EdgeInsets.all(16),
       child: filtered.isEmpty
-          ? const Text(
-              'Tidak ada hari libur di bulan ini',
-              style: TextStyle(fontSize: 14),
+          ? const Center(
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: Text(
+                  'Tidak ada hari libur di bulan ini',
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+              ),
             )
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: filtered.map((h) {
-                final date = h['parsedDate'] as DateTime?;
-                return ListTile(
-                  leading: const Icon(Icons.flag, color: Colors.red),
-                  title: Text(h['name'] ?? '-'),
-                  subtitle: Text(
-                    date != null
-                        ? '${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}'
-                        : (h['date'] ?? '-'),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Text(
+                    'Daftar Hari Libur Bulan Ini',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).primaryColor,
+                    ),
                   ),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () async {
-                      await ScheduleService.deleteHoliday(h['id']);
-                      loadAll();
-                    },
-                  ),
-                );
-              }).toList(),
+                ),
+                ...filtered.map((h) {
+                  final date = h['parsedDate'] as DateTime?;
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    child: ListTile(
+                      leading: const Icon(Icons.flag, color: Colors.red),
+                      title: Text(
+                        h['name'] ?? '-',
+                        style: const TextStyle(fontWeight: FontWeight.w500),
+                      ),
+                      subtitle: Text(
+                        date != null
+                            ? '${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}'
+                            : (h['date'] ?? '-'),
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () async {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Hapus Hari Libur'),
+                              content: Text(
+                                'Apakah Anda yakin ingin menghapus "${h['name']}"?',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, false),
+                                  child: const Text('Batal'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Colors.red,
+                                  ),
+                                  child: const Text('Hapus'),
+                                ),
+                              ],
+                            ),
+                          );
+
+                          if (confirm == true) {
+                            await ScheduleService.deleteHoliday(h['id']);
+                            loadAll();
+                          }
+                        },
+                        tooltip: 'Hapus',
+                      ),
+                    ),
+                  );
+                }),
+              ],
             ),
     );
   }
