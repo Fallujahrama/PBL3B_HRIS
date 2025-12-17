@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:intl/intl.dart';
 import '../models/employee_recap.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'package:universal_html/html.dart' as html;
 
 class EmployeeRecapDetailPage extends StatelessWidget {
   final EmployeeRecap employee;
@@ -15,13 +17,6 @@ class EmployeeRecapDetailPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Detail ${employee.name}'),
-        // actions: [
-        //   IconButton(
-        //     icon: const Icon(Icons.download),
-        //     tooltip: 'Download PDF',
-        //     onPressed: () => _downloadPdf(context),
-        //   ),
-        // ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -82,12 +77,6 @@ class EmployeeRecapDetailPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  // const SizedBox(height: 20),
-                  // _buildInfoRow(Icons.business, 'Departemen', employee.departement ?? '-'),
-                  // const SizedBox(height: 8),
-                  // _buildInfoRow(Icons.person, 'Gender', employee.gender ?? '-'),
-                  // const SizedBox(height: 8),
-                  // _buildInfoRow(Icons.calendar_today, 'Bergabung', employee.createdAt ?? '-'),
                 ],
               ),
             ),
@@ -246,56 +235,30 @@ class EmployeeRecapDetailPage extends StatelessWidget {
           ],
         ),
       ),
-      // bottomNavigationBar: Container(
-      //   padding: const EdgeInsets.all(16),
-      //   decoration: BoxDecoration(
-      //     color: Colors.white,
-      //     boxShadow: [
-      //       BoxShadow(
-      //         color: Colors.grey.shade300,
-      //         blurRadius: 10,
-      //         offset: const Offset(0, -2),
-      //       ),
-      //     ],
-      //   ),
-      //   child: ElevatedButton.icon(
-      //     onPressed: () => _downloadPdf(context),
-      //     icon: const Icon(Icons.picture_as_pdf),
-      //     label: const Text('Download Laporan PDF'),
-      //     style: ElevatedButton.styleFrom(
-      //       backgroundColor: Colors.red.shade700,
-      //       foregroundColor: Colors.white,
-      //       padding: const EdgeInsets.symmetric(vertical: 16),
-      //       textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-      //     ),
-      //   ),
-      // ),
-    );
-  }
-
-  Widget _buildInfoRow(IconData icon, String label, String value) {
-    return Row(
-      children: [
-        Icon(icon, size: 18, color: Colors.white70),
-        const SizedBox(width: 8),
-        Text(
-          '$label: ',
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.white70,
-          ),
-        ),
-        Expanded(
-          child: Text(
-            value,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.shade300,
+              blurRadius: 10,
+              offset: const Offset(0, -2),
             ),
+          ],
+        ),
+        child: ElevatedButton.icon(
+          onPressed: () => _downloadPdf(context),
+          icon: const Icon(Icons.picture_as_pdf),
+          label: const Text('Download Laporan PDF'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red.shade700,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ),
-      ],
+      ),
     );
   }
 
@@ -349,7 +312,7 @@ class EmployeeRecapDetailPage extends StatelessWidget {
   }
 
   Future<void> _downloadPdf(BuildContext context) async {
-    final url = 'https://nontransferential-zola-remonstratingly.ngrok-free.dev/api/employee-recap/pdf?user_id=${employee.id}';
+    final url = 'http://127.0.0.1:8000/api/employee-recap/pdf?user_id=${employee.id}';
     
     try {
       print('🔽 Starting PDF download from: $url');
@@ -374,30 +337,56 @@ class EmployeeRecapDetailPage extends StatelessWidget {
       print('📥 Response status: ${response.statusCode}');
 
       if (response.statusCode == 200) {
-        final directory = Platform.isAndroid
-            ? Directory('/storage/emulated/0/Download')
-            : await getApplicationDocumentsDirectory();
+        if (kIsWeb) {
+          // Web platform - trigger browser download
+          final blob = html.Blob([response.bodyBytes], 'application/pdf');
+          final url = html.Url.createObjectUrlFromBlob(blob);
+          final fileName = 'employee_recap_${employee.name.replaceAll(' ', '_')}_${DateTime.now().millisecondsSinceEpoch}.pdf';
+          
+          final anchor = html.AnchorElement(href: url)
+            ..setAttribute('download', fileName)
+            ..click();
+          
+          html.Url.revokeObjectUrl(url);
 
-        final fileName = 'employee_recap_${employee.name.replaceAll(' ', '_')}_${DateTime.now().millisecondsSinceEpoch}.pdf';
-        final file = File('${directory.path}/$fileName');
-        
-        await file.writeAsBytes(response.bodyBytes);
+          print('✅ PDF download triggered for web');
 
-        print('✅ File saved to: ${file.path}');
-
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('✅ PDF tersimpan di:\n${file.path}'),
-              backgroundColor: Colors.green,
-              duration: const Duration(seconds: 5),
-              action: SnackBarAction(
-                label: 'OK',
-                textColor: Colors.white,
-                onPressed: () {},
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('✅ PDF berhasil diunduh'),
+                backgroundColor: Colors.green,
+                duration: Duration(seconds: 3),
               ),
-            ),
-          );
+            );
+          }
+        } else {
+          // Mobile platform (Android/iOS)
+          final directory = Platform.isAndroid
+              ? Directory('/storage/emulated/0/Download')
+              : await getApplicationDocumentsDirectory();
+
+          final fileName = 'employee_recap_${employee.name.replaceAll(' ', '_')}_${DateTime.now().millisecondsSinceEpoch}.pdf';
+          final file = File('${directory.path}/$fileName');
+          
+          await file.writeAsBytes(response.bodyBytes);
+
+          print('✅ File saved to: ${file.path}');
+
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('✅ PDF tersimpan di:\n${file.path}'),
+                backgroundColor: Colors.green,
+                duration: const Duration(seconds: 5),
+                action: SnackBarAction(
+                  label: 'OK',
+                  textColor: Colors.white,
+                  onPressed: () {},
+                ),
+              ),
+            );
+          }
         }
       } else {
         print('❌ Error: ${response.statusCode}');

@@ -16,12 +16,10 @@ class LetterController extends Controller
     public function index()
     {
         try {
-            // ✅ Load with relations
             $letters = Letter::with(['letterFormat', 'employee'])
                 ->orderBy('created_at', 'desc')
                 ->get();
 
-            // ✅ Return langsung array (biar simple dulu)
             return response()->json($letters, 200);
         } catch (\Exception $e) {
             Log::error('LetterController index error: ' . $e->getMessage());
@@ -58,7 +56,6 @@ class LetterController extends Controller
             $letter = Letter::with(['letterFormat'])->findOrFail($id);
             $letter->status = $request->status;
 
-            // ✅ Generate PDF saat approve (KEMBALIKAN SEPERTI KEMARIN)
             if ($request->status == 'approved') {
 
 
@@ -110,14 +107,10 @@ class LetterController extends Controller
 
                 $pdf = Pdf::loadView('letters.template', $data);
 
-                // ✅ Format file name seperti kemarin: surat_{id}_{timestamp}.pdf
                 $fileName = 'surat_' . $letter->id . '_' . time() . '.pdf';
 
-                // ✅ FIX: Jangan pakai 'public/' di path, langsung nama file
-                // Storage akan otomatis save ke disk 'public'
                 $path = 'letters/' . $fileName;
 
-                // ✅ FIX: Explicitly gunakan disk 'public'
                 Storage::disk('public')->put($path, $pdf->output());
 
                 $letter->pdf_path = $path;
@@ -154,10 +147,8 @@ class LetterController extends Controller
                 ], 404);
             }
 
-            // ✅ pdf_path sudah berisi 'letters/surat_x_timestamp.pdf'
-            // Langsung gunakan storage_path
             $fullPath = storage_path('app/public/' . $letter->pdf_path);
-            
+
             Log::info('Download PDF attempt', [
                 'letter_id' => $id,
                 'pdf_path' => $letter->pdf_path,

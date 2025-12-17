@@ -162,17 +162,17 @@ class ApiService {
       print('🔽 Downloading PDF for letter $id');
       print('📡 baseUrl: $baseUrl');
 
-      // Fix: Gunakan baseUrl yang lengkap
-      final url = Uri.parse('$baseUrl/api/letters/$id/download');
+      final url = Uri.parse('$baseUrl/letters/$id/download');
       print('📡 Full URL: $url');
+
+      final Map<String, String> headers = await _headersWithToken();
+
+      headers['Accept'] = 'application/pdf';
+      headers['ngrok-skip-browser-warning'] = 'true'; 
 
       final res = await http.get(
         url,
-        headers: {
-          'Accept': 'application/pdf',
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': 'true',
-        },
+        headers: headers,
       );
 
       print('📥 PDF Download Status: ${res.statusCode}');
