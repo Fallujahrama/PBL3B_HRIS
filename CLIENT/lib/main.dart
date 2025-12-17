@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'routes/app_routes.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'features/schedule/localizations/locale_setup.dart';
 
 void main() async { 
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +25,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routerConfig: AppRoutes.router,
       themeMode: ThemeMode.light,
+      localizationsDelegates: LocaleSetup.delegates,
+      supportedLocales: LocaleSetup.supportedLocales,
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: lightColorScheme, // Gunakan skema yang dihasilkan

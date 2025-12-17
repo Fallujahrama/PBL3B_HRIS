@@ -142,8 +142,8 @@ class EmployeeSeeder extends Seeder
         // =============== SCHEDULES ============================
         // ======================================================
         DB::table('schedules')->insert([
-            ['date' => '2025-01-01', 'created_at' => now(), 'updated_at' => now()],
-            ['date' => '2025-01-02', 'created_at' => now(), 'updated_at' => now()],
+            ['date' => '2025-01-01', 'name' => 'New Year\'s Day', 'created_at' => now(), 'updated_at' => now()],
+            ['date' => '2025-01-02', 'name' => 'Day After New Year', 'created_at' => now(), 'updated_at' => now()],
         ]);
 
         // ======================================================

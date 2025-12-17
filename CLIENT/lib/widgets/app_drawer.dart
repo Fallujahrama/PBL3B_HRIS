@@ -182,6 +182,11 @@ class AppDrawer extends StatelessWidget {
               title: const Text("Rekap Surat Karyawan"),
               onTap: () => context.go('/employee-recap'),
             ),
+            ListTile(
+              leading: const Icon(Icons.calendar_today),
+              title: const Text("Jadwal Hari Libur"),
+              onTap: () => context.go('/schedule'),
+            ),
             const Divider(),
           ],
 
