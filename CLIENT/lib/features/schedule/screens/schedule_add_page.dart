@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../services/schedule_service.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 class ScheduleAddPage extends StatefulWidget {
   const ScheduleAddPage({super.key});

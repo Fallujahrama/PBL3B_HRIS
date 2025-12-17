@@ -4,6 +4,7 @@ import '../widgets/schedule_calender_widget.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import '../services/schedule_service.dart';
 import '../../../theme/app_theme.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 class SchedulePage extends StatefulWidget {
   const SchedulePage({super.key});
