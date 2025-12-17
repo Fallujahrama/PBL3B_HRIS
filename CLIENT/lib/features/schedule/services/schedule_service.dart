@@ -1,11 +1,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart'; // Import dotenv
 
 class ScheduleService {
-  // Gunakan baseUrl yang sama dengan service lain
-  static const String baseUrl = 'http://localhost:8000/api';
-  // Untuk testing lokal: http://localhost:8000/api
-  // Untuk device: http://{IP_KOMPUTER}:8000/api
+  // Ambil BASE_URL dari file .env
+  // Pastikan kunci ini (BASE_URL) ada di file .env Anda.
+  // Contoh: BASE_URL=http://localhost:8000/api
+  static final String baseUrl = dotenv.env['BASE_URL'] ?? 'http://localhost:8000/api'; 
+  
+  // Catatan: Nilai fallback (seperti 'http://localhost:8000/api') 
+  // sangat disarankan jika dotenv gagal memuat.
 
   static Map<String, String> _getHeaders() {
     return {
@@ -40,7 +44,7 @@ class ScheduleService {
     }
   }
 
-  // 2. Add Holiday
+  // 2. Add Holiday (Tidak ada perubahan di sini selain penggunaan baseUrl)
   static Future<bool> addHoliday(String date, String name) async {
     try {
       final uri = Uri.parse('$baseUrl/schedules');
@@ -60,7 +64,7 @@ class ScheduleService {
     }
   }
 
-  // 3. Delete Holiday
+  // 3. Delete Holiday (Tidak ada perubahan di sini selain penggunaan baseUrl)
   static Future<bool> deleteHoliday(int id) async {
     try {
       final uri = Uri.parse('$baseUrl/schedules/$id');
@@ -76,7 +80,7 @@ class ScheduleService {
     }
   }
 
-  // 4. Sync National Holidays
+  // 4. Sync National Holidays (Tidak ada perubahan di sini selain penggunaan baseUrl)
   static Future<void> syncNationalHolidays(int year) async {
     try {
       final uri = Uri.parse('$baseUrl/schedules/sync?year=$year');
