@@ -15,6 +15,8 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\SalaryController;
 use App\Http\Controllers\Api\EmployeeDashboardController;
 use App\Http\Controllers\Api\AbsensiController;
+use App\Http\Controllers\Api\ScheduleController;
+use App\Http\Controllers\Api\AttendanceReportController;
 use App\Models\Absensi;
 use App\Http\Controllers\Api\AdminController;
 
@@ -114,5 +116,16 @@ Route::prefix('employee')
     // Endpoint: /api/employee/salary-slip
     // ==========================================
     Route::get('/salary-slip', [SalaryController::class, 'getSalarySlip']);
-
 });
+
+Route::prefix('schedules')->group(function () {
+    Route::get('/', [ScheduleController::class, 'index']);                   // GET /api/schedules?year=YYYY
+    Route::get('/sync', [ScheduleController::class, 'sync']);               // GET /api/schedules/sync?year=YYYY
+    Route::get('/month/{month}', [ScheduleController::class, 'byMonth']);   // GET /api/schedules/month/12?year=2025
+    Route::get('/is-holiday/{date}', [ScheduleController::class, 'isHoliday']); // GET /api/schedules/is-holiday/2025-12-25
+    Route::post('/', [ScheduleController::class, 'store']);                 // POST /api/schedules
+    Route::delete('/{id}', [ScheduleController::class, 'destroy']);         // DELETE /api/schedules/{id}
+});
+
+Route::get('/attendance/report', [AttendanceReportController::class, 'index']);
+Route::get('attendance/report/export', [AttendanceReportController::class, 'export']);

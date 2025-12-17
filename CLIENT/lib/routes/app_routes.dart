@@ -1,6 +1,8 @@
 import 'package:go_router/go_router.dart';
 import 'package:hris_3B/features/summary_salary/screens/summary_salary_screen.dart';
 // import 'package:tracer_study_test_api/features/summary_salary/screens/summary_salary_screen.dart';
+import '../features/schedule/screens/schedule_add_page.dart';
+import '../features/schedule/screens/schedule_page.dart';
 import '../features/splash/screens/splash_screen.dart';
 import '../features/home/screens/home_screen.dart';
 import '../features/employee/screens/employee_list_screen.dart';
@@ -36,6 +38,7 @@ import '../features/login/screens/forgot_password_page.dart';
 import '../features/dashboard/screens/landing_screen.dart';
 import '../features/dashboard/screens/admin_dashboard_screen.dart';
 import '../features/dashboard/screens/employee_dashboard_screen.dart';
+import '../features/attendance_report/attendance_report_page.dart';
 
 class AppRoutes {
   // 🔹 tambahkan konstanta nama route
@@ -248,11 +251,21 @@ class AppRoutes {
         path: '/employee/profile',
         builder: (context, state) => const ProfilePage(),
       ),
+
+
       // Attendance ROUTES
       GoRoute(
         path: '/attendance',
         builder: (context, state) => const AttendanceScreen(),
       ),
+      // Schedule ROUTES
+      GoRoute(path: '/schedule', builder: (ctx, state) => const SchedulePage()),
+      GoRoute(
+        path: '/schedule/add',
+        builder: (ctx, state) => const ScheduleAddPage(),
+      ),
+      // Attendance Report ROUTES
+      GoRoute(path: '/attendance_report_page', builder: (ctx, state) => const AttendanceReportPage()),
     ],
   );
 }
