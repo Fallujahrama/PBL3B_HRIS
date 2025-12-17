@@ -38,6 +38,7 @@ import '../features/login/screens/forgot_password_page.dart';
 import '../features/dashboard/screens/landing_screen.dart';
 import '../features/dashboard/screens/admin_dashboard_screen.dart';
 import '../features/dashboard/screens/employee_dashboard_screen.dart';
+import '../features/attendance_report/attendance_report_page.dart';
 
 class AppRoutes {
   // 🔹 tambahkan konstanta nama route
@@ -263,6 +264,8 @@ class AppRoutes {
         path: '/schedule/add',
         builder: (ctx, state) => const ScheduleAddPage(),
       ),
+      // Attendance Report ROUTES
+      GoRoute(path: '/attendance_report_page', builder: (ctx, state) => const AttendanceReportPage()),
     ],
   );
 }

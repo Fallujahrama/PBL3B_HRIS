@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\SalaryController;
 use App\Http\Controllers\Api\EmployeeDashboardController;
 use App\Http\Controllers\Api\AbsensiController;
 use App\Http\Controllers\Api\ScheduleController;
+use App\Http\Controllers\Api\AttendanceReportController;
 use App\Models\Absensi;
 use App\Http\Controllers\Api\AdminController;
 
@@ -125,3 +126,6 @@ Route::prefix('schedules')->group(function () {
     Route::post('/', [ScheduleController::class, 'store']);                 // POST /api/schedules
     Route::delete('/{id}', [ScheduleController::class, 'destroy']);         // DELETE /api/schedules/{id}
 });
+
+Route::get('/attendance/report', [AttendanceReportController::class, 'index']);
+Route::get('attendance/report/export', [AttendanceReportController::class, 'export']);
