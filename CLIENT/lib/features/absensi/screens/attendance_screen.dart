@@ -7,6 +7,7 @@ import '../models/attendance_models.dart';
 import '../services/api_services.dart';
 import '../services/geolocator_services.dart';
 import '../../../widgets/app_drawer.dart';
+import '../../login/models/user_logged_model.dart'; // ✅ Import UserLoggedModel
 
 class AttendanceScreen extends StatefulWidget {
   const AttendanceScreen({super.key});
@@ -17,7 +18,7 @@ class AttendanceScreen extends StatefulWidget {
 
 class _AttendanceScreenState extends State<AttendanceScreen> {
   // ==========================================
-  // LOGIC & STATE (TIDAK DIUBAH)
+  // LOGIC & STATE
   // ==========================================
   DateTime selectedTime = DateTime.now();
   DateTime? checkIn;
@@ -32,7 +33,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   String radiusStatus = "";
   List<CheckClockHistory> attendanceHistory = [];
 
-  final int employeeId = 1;
+  // ✅ Ambil employeeId dari user yang login
+  int? employeeId;
 
   @override
   void initState() {
@@ -41,14 +43,30 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   Future<void> _initializeScreen() async {
-    await _getCurrentLocation();
-    await _getDepartmentLocation();
-    await _fetchAttendanceHistory();
+    // ✅ Dapatkan employeeId dari user yang login
+    final userModel = UserLoggedModel();
+    final employee = userModel.employeeData;
+    
+    if (employee != null && employee['id'] != null) {
+      employeeId = employee['id'] as int;
+      
+      // Lanjutkan inisialisasi jika employeeId valid
+      await _getCurrentLocation();
+      await _getDepartmentLocation();
+      await _fetchAttendanceHistory();
+    } else {
+      // ❌ Jika tidak ada employeeId, tampilkan error
+      if (mounted) {
+        setState(() {
+          statusMessage = "❌ Data karyawan tidak ditemukan. Silakan login ulang.";
+        });
+      }
+    }
   }
 
   Future<void> _getCurrentLocation() async {
     final pos = await GeolocatorService.getCurrentPosition();
-    if (pos != null) {
+    if (pos != null && mounted) {
       setState(() {
         currentPosition = pos;
       });
@@ -57,23 +75,35 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   Future<void> _getDepartmentLocation() async {
+    // ✅ Cek employeeId sebelum request
+    if (employeeId == null) return;
+    
     try {
-      final dept = await ApiService.getDepartmentLocation(employeeId);
-      setState(() {
-        departmentLocation = dept;
-      });
-      _checkIfWithinRadius();
+      final dept = await ApiService.getDepartmentLocation(employeeId!);
+      if (mounted) {
+        setState(() {
+          departmentLocation = dept;
+        });
+        _checkIfWithinRadius();
+      }
     } catch (e) {
-      setState(() => statusMessage = "❌ Gagal mendapatkan lokasi departemen");
+      if (mounted) {
+        setState(() => statusMessage = "❌ Gagal mendapatkan lokasi departemen");
+      }
     }
   }
 
   Future<void> _fetchAttendanceHistory() async {
+    // ✅ Cek employeeId sebelum request
+    if (employeeId == null) return;
+    
     try {
-      final history = await ApiService.getAttendanceHistory(employeeId);
-      setState(() {
-        attendanceHistory = history;
-      });
+      final history = await ApiService.getAttendanceHistory(employeeId!);
+      if (mounted) {
+        setState(() {
+          attendanceHistory = history;
+        });
+      }
     } catch (e) {
       debugPrint("Error fetching history: $e");
     }
@@ -89,12 +119,14 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       departmentLocation!.longitude,
     );
 
-    setState(() {
-      isWithinRadius = distance <= departmentLocation!.radius;
-      radiusStatus = isWithinRadius
-          ? "Dalam jangkauan departemen (${distance.toStringAsFixed(2)} KM)"
-          : "Diluar jangkauan departemen (${distance.toStringAsFixed(2)} KM)";
-    });
+    if (mounted) {
+      setState(() {
+        isWithinRadius = distance <= departmentLocation!.radius;
+        radiusStatus = isWithinRadius
+            ? "Dalam jangkauan departemen (${distance.toStringAsFixed(2)} KM)"
+            : "Diluar jangkauan departemen (${distance.toStringAsFixed(2)} KM)";
+      });
+    }
   }
 
   double _calculateDistance(
@@ -123,6 +155,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   Future<void> _handlePunch(String type) async {
+    // ✅ Cek employeeId sebelum submit
+    if (employeeId == null) {
+      _showErrorMessage("❌ Data karyawan tidak valid!");
+      return;
+    }
+    
     if (currentPosition == null) {
       _showErrorMessage("Gagal mendapatkan lokasi!");
       return;
@@ -134,21 +172,23 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     }
 
     final request = AttendanceRequest(
-      employeeId: employeeId,
+      employeeId: employeeId!, // ✅ Gunakan employeeId dari login
       time: selectedTime,
       latitude: currentPosition!.latitude,
       longitude: currentPosition!.longitude,
       checkType: type,
     );
 
-    setState(() {
-      isLoading = true;
-      statusMessage = "Mengirim data...";
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+        statusMessage = "Mengirim data...";
+      });
+    }
 
     try {
       final response = await ApiService.submitAttendance(request);
-      if (response.success) {
+      if (mounted && response.success) {
         setState(() {
           if (type == 'clock_in') {
             checkIn = selectedTime;
@@ -165,18 +205,24 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           }
         });
         await _fetchAttendanceHistory();
-      } else {
+      } else if (mounted) {
         _showErrorMessage(response.message);
       }
     } catch (e) {
-      _showErrorMessage("❌ Error: $e");
+      if (mounted) {
+        _showErrorMessage("❌ Error: $e");
+      }
     }
 
-    setState(() => isLoading = false);
+    if (mounted) {
+      setState(() => isLoading = false);
+    }
   }
 
   void _showErrorMessage(String message) {
-    setState(() => statusMessage = message);
+    if (mounted) {
+      setState(() => statusMessage = message);
+    }
   }
 
   String _formatTime(DateTime? dateTime) {
@@ -231,6 +277,58 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // ✅ Tampilkan error jika employeeId null
+    if (employeeId == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text("Live Attendance"),
+          backgroundColor: const Color(0xFF0066CC),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.error_outline,
+                size: 64,
+                color: Colors.red,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                "Data karyawan tidak ditemukan",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                "Silakan login ulang",
+                style: TextStyle(color: Colors.grey),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: () {
+                  // Redirect ke halaman login
+                  Navigator.of(context).pushReplacementNamed('/login');
+                },
+                icon: const Icon(Icons.login),
+                label: const Text("Login"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0066CC),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 12,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     // Warna Utama
     final primaryBlue = const Color(0xFF0066CC);
     final bgGrey = const Color(0xFFF4F6F9);
@@ -251,7 +349,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         ),
         backgroundColor: primaryBlue,
         centerTitle: true,
-        elevation: 0, // Hilangkan shadow agar menyatu dengan container bawah
+        elevation: 0,
         leading: Builder(
           builder: (context) => IconButton(
             icon: const Icon(Icons.menu, color: Colors.white),
@@ -263,14 +361,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // --- HEADER YANG DIMODIFIKASI ---
-            // Dibuat lebar (width: double.infinity) dan menonjol
+            // --- HEADER ---
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 50),
               decoration: BoxDecoration(
                 color: primaryBlue,
-                // Memberikan sedikit lengkungan di bawah agar terlihat modern
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(30),
                   bottomRight: Radius.circular(30),
@@ -281,11 +377,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   Text(
                     "${selectedTime.hour.toString().padLeft(2, '0')}.${selectedTime.minute.toString().padLeft(2, '0')}",
                     style: const TextStyle(
-                      fontSize: 64, // Diperbesar agar menonjol
+                      fontSize: 64,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                       height: 1.0,
-                      letterSpacing: 2.0, // Memberi jarak antar angka
+                      letterSpacing: 2.0,
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -300,11 +396,10 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 ],
               ),
             ),
-            // ---------------------------------
 
-            // Container untuk konten di bawahnya (ditarik sedikit ke atas)
+            // Container untuk konten di bawahnya
             Transform.translate(
-              offset: const Offset(0, -25), // Efek overlap ke atas
+              offset: const Offset(0, -25),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
@@ -390,8 +485,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                             color: primaryBlue,
                             onPressed:
                                 !isLoading && checkIn == null && isWithinRadius
-                                ? () => _handlePunch('clock_in')
-                                : null,
+                                    ? () => _handlePunch('clock_in')
+                                    : null,
                             isActive:
                                 !isLoading && checkIn == null && isWithinRadius,
                           ),
@@ -403,16 +498,16 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                             color: primaryBlue,
                             onPressed:
                                 !isLoading &&
-                                    checkIn != null &&
-                                    checkOut == null &&
-                                    isWithinRadius
-                                ? () => _handlePunch('clock_out')
-                                : null,
+                                        checkIn != null &&
+                                        checkOut == null &&
+                                        isWithinRadius
+                                    ? () => _handlePunch('clock_out')
+                                    : null,
                             isActive:
                                 !isLoading &&
-                                checkIn != null &&
-                                checkOut == null &&
-                                isWithinRadius,
+                                    checkIn != null &&
+                                    checkOut == null &&
+                                    isWithinRadius,
                           ),
                         ),
                       ],
@@ -427,16 +522,16 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                             activeColor: Colors.orange,
                             onPressed:
                                 !isLoading &&
-                                    checkOut != null &&
-                                    overtimeStart == null &&
-                                    isWithinRadius
-                                ? () => _handlePunch('overtime_start')
-                                : null,
+                                        checkOut != null &&
+                                        overtimeStart == null &&
+                                        isWithinRadius
+                                    ? () => _handlePunch('overtime_start')
+                                    : null,
                             isActive:
                                 !isLoading &&
-                                checkOut != null &&
-                                overtimeStart == null &&
-                                isWithinRadius,
+                                    checkOut != null &&
+                                    overtimeStart == null &&
+                                    isWithinRadius,
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -447,16 +542,16 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                             activeColor: Colors.orange,
                             onPressed:
                                 !isLoading &&
-                                    overtimeStart != null &&
-                                    overtimeEnd == null &&
-                                    isWithinRadius
-                                ? () => _handlePunch('overtime_end')
-                                : null,
+                                        overtimeStart != null &&
+                                        overtimeEnd == null &&
+                                        isWithinRadius
+                                    ? () => _handlePunch('overtime_end')
+                                    : null,
                             isActive:
                                 !isLoading &&
-                                overtimeStart != null &&
-                                overtimeEnd == null &&
-                                isWithinRadius,
+                                    overtimeStart != null &&
+                                    overtimeEnd == null &&
+                                    isWithinRadius,
                           ),
                         ),
                       ],
@@ -494,7 +589,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                     const SizedBox(height: 30),
 
                     // --- Riwayat ---
-                    Align(
+                    const Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         "Riwayat absensi",

@@ -27,7 +27,7 @@ class CheckClocksSeeder extends Seeder
         }
 
         // Bulan yang ingin di-seed
-        $months = [10, 11, 12];
+        $months = [10, 11];
         $year = Carbon::now()->year; // Tahun ini
 
         foreach ($employeeIds as $emp) {

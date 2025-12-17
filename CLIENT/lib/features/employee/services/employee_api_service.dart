@@ -6,7 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class EmployeeApiService {
   // Ganti dengan URL API Laravel Anda
 
-  static final String baseUrl = dotenv.env['BASE_URL'] ?? 'http://127.0.0.1:8000/api';
+  static final String baseUrl = dotenv.env['BASE_URL'] ?? 'https://nontransferential-zola-remonstratingly.ngrok-free.dev/api';
 
   
   

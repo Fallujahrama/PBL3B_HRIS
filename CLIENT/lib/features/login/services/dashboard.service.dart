@@ -15,7 +15,7 @@ class EmployeeService {
   //   }
   // }
 
-  String get baseUrl => 'http://127.0.0.1:8000/api';
+  String get baseUrl => 'https://nontransferential-zola-remonstratingly.ngrok-free.dev/api';
 
   Future<String?> _getToken() async {
     final prefs = await SharedPreferences.getInstance();

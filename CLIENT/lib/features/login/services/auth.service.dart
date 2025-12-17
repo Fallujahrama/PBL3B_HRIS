@@ -5,7 +5,7 @@ import '../models/user_model.dart';
 import '../models/user_logged_model.dart'; // <--- Importasi Model Singleton
 
 class AuthService {
-  final String baseUrl = "http://127.0.0.1:8000/api";
+  final String baseUrl = "https://nontransferential-zola-remonstratingly.ngrok-free.dev/api";
 
   // =============================
   //            LOGIN

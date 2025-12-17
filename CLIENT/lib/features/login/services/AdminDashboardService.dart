@@ -9,7 +9,7 @@ class AdminDashboardService {
     final token = prefs.getString('token');
 
     final url =
-        Uri.parse('http://127.0.0.1:8000/api/admin/dashboard/stats?month=$month');
+        Uri.parse('https://nontransferential-zola-remonstratingly.ngrok-free.dev/api/admin/dashboard/stats?month=$month');
     final response = await http.get(
       url,
       headers: {

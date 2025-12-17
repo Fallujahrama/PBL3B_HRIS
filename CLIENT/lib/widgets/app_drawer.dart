@@ -27,7 +27,7 @@ class AppDrawer extends StatelessWidget {
        return Drawer(
           child: ListView(
             children: [
-              DrawerHeader(
+              const DrawerHeader(
                 child: Center(child: Text("Silakan Login")),
               ),
               ListTile(
@@ -47,16 +47,31 @@ class AppDrawer extends StatelessWidget {
     
     final primaryColor = Theme.of(context).colorScheme.primary;
 
-    // Fungsi untuk Logout
+    // ✅ FUNGSI LOGOUT YANG DIPERBAIKI
     Future<void> handleLogout() async {
-      context.pop(); // Tutup drawer
+      // Simpan context sebelum async operation
+      final navigator = Navigator.of(context);
+      final scaffoldMessenger = ScaffoldMessenger.of(context);
+      
+      // Tutup drawer terlebih dahulu
+      navigator.pop();
+      
       try {
-        await AuthService().logout(); // Panggil fungsi logout
-        context.go('/login'); // Arahkan ke halaman login
+        // Panggil fungsi logout
+        await AuthService().logout();
+        
+        // Gunakan context.go yang aman untuk GoRouter
+        if (context.mounted) {
+          context.go('/login');
+        }
       } catch (e) {
-        // Tampilkan error jika logout API gagal (meskipun data lokal sudah dihapus)
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Gagal logout: $e")),
+        // Tampilkan error jika logout API gagal
+        scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text("Gagal logout: $e"),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
         );
       }
     }
@@ -100,47 +115,55 @@ class AppDrawer extends StatelessWidget {
               ),
             ),
             onDetailsPressed: () {
-              context.pop(); 
+              Navigator.of(context).pop();
               context.go('/employee/profile');
             },
           ),
           // ==== AKHIR MODERN DRAWER HEADER ====
 
-          // ==== MENU UMUM (SELALU ADA) ====
-          // ListTile(
-          //   leading: const Icon(Icons.home_outlined),
-          //   title: const Text("Home"),
-          //   onTap: () => context.go('/home'),
-          // ),
-
           // ==== MENU UNTUK EMPLOYEE (ROLE 0) ====
           if (!isAdmin) ...[
-             ListTile(
+            ListTile(
               leading: const Icon(Icons.dashboard_outlined),
               title: const Text('Dashboard'),
-              onTap: () => context.go('/employee-dashboard'), // Ganti rute jika perlu
+              onTap: () {
+                Navigator.of(context).pop();
+                context.go('/employee-dashboard');
+              },
             ),
-          const Divider(),
+            const Divider(),
           
             ListTile(
               leading: const Icon(Icons.access_time_outlined),
               title: const Text('Absensi'),
-              onTap: () => context.go('/attendance'),
+              onTap: () {
+                Navigator.of(context).pop();
+                context.go('/attendance');
+              },
             ),
-             ListTile(
+            ListTile(
               leading: const Icon(Icons.insert_chart_outlined),
               title: const Text('Laporan Absensi'),
-              onTap: () => context.go('/employee/report'), // Laporan semua karyawan
+              onTap: () {
+                Navigator.of(context).pop();
+                context.go('/employee/report');
+              },
             ),
             ListTile(
               leading: const Icon(Icons.mail_outline),
               title: const Text("Pengajuan Surat"),
-              onTap: () => context.go('/form-surat'),
+              onTap: () {
+                Navigator.of(context).pop();
+                context.go('/form-surat');
+              },
             ),
             ListTile(
               leading: const Icon(Icons.money_outlined),
               title: const Text('Gaji'),
-              onTap: () => context.go('/employee/salary'),
+              onTap: () {
+                Navigator.of(context).pop();
+                context.go('/employee/salary');
+              },
             ),
           ],
           
@@ -150,37 +173,53 @@ class AppDrawer extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.dashboard_outlined),
               title: const Text('Dashboard'),
-              onTap: () => context.go('/admin-dashboard'), // Ganti rute jika perlu
+              onTap: () {
+                Navigator.of(context).pop();
+                context.go('/admin-dashboard');
+              },
             ),
-          const Divider(),
+            const Divider(),
 
             ListTile(
               leading: const Icon(Icons.storage_outlined),
               title: const Text("Master Data"),
-              onTap: () => context.go('/master-data'),
+              onTap: () {
+                Navigator.of(context).pop();
+                context.go('/master-data');
+              },
             ),
            
             ListTile(
               leading: const Icon(Icons.article_outlined),
               title: const Text("Laporan Gaji Karyawan"),
-              onTap: () => context.go('/summary-salary'),
+              onTap: () {
+                Navigator.of(context).pop();
+                context.go('/summary-salary');
+              },
             ),
-            // Jika ada menu Approval/Persetujuan Admin
             ListTile(
               leading: const Icon(Icons.settings_outlined),
               title: const Text("Kelola Template Surat"),
-              onTap: () => context.go('/letters'),
+              onTap: () {
+                Navigator.of(context).pop();
+                context.go('/letters');
+              },
             ),
             ListTile(
               leading: const Icon(Icons.done_all_outlined),
               title: const Text("Persetujuan Surat"),
-              onTap: () => context.go('/hrd-list'),
+              onTap: () {
+                Navigator.of(context).pop();
+                context.go('/hrd-list');
+              },
             ),
-            // Jika ada menu Rekap Surat Karyawan
             ListTile(
               leading: const Icon(Icons.assessment),
               title: const Text("Rekap Surat Karyawan"),
-              onTap: () => context.go('/employee-recap'),
+              onTap: () {
+                Navigator.of(context).pop();
+                context.go('/employee-recap');
+              },
             ),
             const Divider(),
           ],

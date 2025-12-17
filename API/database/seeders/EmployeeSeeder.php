@@ -20,20 +20,20 @@ class EmployeeSeeder extends Seeder
         // ======================================================
         // =============== DEPARTMENTS ==========================
         // ======================================================
-        $deptHR = Department::create([
-            'name' => 'Human Resource',
-            'radius' => '100'
-        ]);
+        // $deptHR = Department::create([
+        //     'name' => 'Human Resource',
+        //     'radius' => '100'
+        // ]);
 
-        $deptIT = Department::create([
-            'name' => 'Information Technology',
-            'radius' => '100'
-        ]);
+        // $deptIT = Department::create([
+        //     'name' => 'Information Technology',
+        //     'radius' => '100'
+        // ]);
 
-        $deptFinance = Department::create([
-            'name' => 'Finance',
-            'radius' => '100'
-        ]);
+        // $deptFinance = Department::create([
+        //     'name' => 'Finance',
+        //     'radius' => '100'
+        // ]);
 
         // ======================================================
         // =============== POSITIONS ============================

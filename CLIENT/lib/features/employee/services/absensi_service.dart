@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AbsensiService {
-  static String baseUrl = "http://127.0.0.1:8000/api";
+  static String baseUrl = "https://nontransferential-zola-remonstratingly.ngrok-free.dev/api";
 
   static String monthName(String mm) {
     const map = {

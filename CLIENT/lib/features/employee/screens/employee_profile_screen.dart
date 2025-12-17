@@ -45,10 +45,10 @@ Future<void> fetchEmployeeData() async {
       return;
     }
 
-    final url = Uri.parse("http://127.0.0.1:8000/api/employee/profile");
+    final url = Uri.parse("https://nontransferential-zola-remonstratingly.ngrok-free.dev/api/employee/profile");
 
     final response = await http.get(
-  Uri.parse("http://127.0.0.1:8000/api/employee/profile"),
+  Uri.parse("https://nontransferential-zola-remonstratingly.ngrok-free.dev/api/employee/profile"),
   headers: {
     "Authorization": "Bearer $token",
     "Accept": "application/json",
@@ -127,13 +127,35 @@ Future<void> fetchEmployeeData() async {
                 Positioned(
                   bottom: 0,
                   right: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: Colors.deepPurple,
-                      borderRadius: BorderRadius.circular(50),
+                  child: GestureDetector(
+                    onTap: () {
+                      // ✅ Navigasi ke halaman edit profile
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EmployeeEditProfileScreen(employeeData!),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF446A8C), // ✅ Samakan warna dengan button bawah
+                        borderRadius: BorderRadius.circular(50),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.edit, 
+                        color: Colors.white, 
+                        size: 18,
+                      ),
                     ),
-                    child: const Icon(Icons.edit, color: Colors.white, size: 18),
                   ),
                 )
               ],
@@ -228,7 +250,7 @@ Future<void> fetchEmployeeData() async {
               ),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF446A8C),
+              backgroundColor: const Color(0xFF446A8C),
               padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),

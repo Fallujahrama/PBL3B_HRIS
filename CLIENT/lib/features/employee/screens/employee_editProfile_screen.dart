@@ -56,7 +56,7 @@ class EmployeeEditProfileScreenState
         return;
       }
 
-      final url = Uri.parse('http://127.0.0.1:8000/api/employee/profile');
+      final url = Uri.parse('https://nontransferential-zola-remonstratingly.ngrok-free.dev/api/employee/profile');
 
       final body = {
         "first_name": firstNameController.text.trim(),
